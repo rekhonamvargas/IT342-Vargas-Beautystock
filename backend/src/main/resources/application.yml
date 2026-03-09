@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: beautystock-api
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://ep-jolly-mud-a1s7m4ju-pooler.ap-southeast-1.aws.neon.tech/IT342-Vargas-Beautystock?sslmode=require
+    username: neondb_owner
+    password: npg_3d1TStbRYlwo
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
+      data-source-properties:
+        sslmode: require
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+  cache:
+    type: simple
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:rekhonavargas04@gmail.com}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-at-least-32-characters-long-change-this-in-production-12345}
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+
+
+server:
+  servlet:
+    context-path: /api
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.beautystock: DEBUG
+    org.springframework.security: DEBUG
