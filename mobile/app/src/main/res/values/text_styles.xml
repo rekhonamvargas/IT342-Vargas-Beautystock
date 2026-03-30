@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ── Display — Lora serif, large hero headings ──────────────────── -->
+    <style name="TextAppearance.DisplayLarge" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/lora</item>
+        <item name="android:textSize">57sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/neutral_10</item>
+        <item name="android:letterSpacing">-0.025</item>
+    </style>
+
+    <style name="TextAppearance.DisplayMedium" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/lora</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/neutral_10</item>
+    </style>
+
+    <style name="TextAppearance.DisplaySmall" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/lora</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/neutral_10</item>
+    </style>
+
+    <!-- ── Headline — Lora serif, section headings ────────────────────── -->
+    <style name="TextAppearance.HeadlineLarge" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/lora</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/neutral_10</item>
+    </style>
+
+    <style name="TextAppearance.HeadlineMedium" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/lora</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/neutral_10</item>
+    </style>
+
+    <style name="TextAppearance.HeadlineSmall" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/lora</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/neutral_10</item>
+    </style>
+
+    <!-- ── Title — Poppins semi-bold, card titles, nav labels ─────────── -->
+    <style name="TextAppearance.TitleLarge" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/neutral_10</item>
+    </style>
+
+    <style name="TextAppearance.TitleMedium" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/neutral_10</item>
+        <item name="android:letterSpacing">0.015</item>
+    </style>
+
+    <style name="TextAppearance.TitleSmall" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/neutral_10</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <!-- ── Body — Poppins regular, main readable content ──────────────── -->
+    <style name="TextAppearance.BodyLarge" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/neutral_10</item>
+        <item name="android:letterSpacing">0.005</item>
+    </style>
+
+    <style name="TextAppearance.BodyMedium" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/neutral_10</item>
+        <item name="android:letterSpacing">0.0025</item>
+    </style>
+
+    <style name="TextAppearance.BodySmall" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/neutral_var_50</item>
+        <item name="android:letterSpacing">0.004</item>
+    </style>
+
+    <!-- ── Label — Poppins bold, chips, badges, caps labels ───────────── -->
+    <style name="TextAppearance.LabelLarge" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <style name="TextAppearance.LabelMedium" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:letterSpacing">0.005</item>
+    </style>
+
+    <style name="TextAppearance.LabelSmall" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:letterSpacing">0.008</item>
+    </style>
+
+    <!-- ── Specialized Styles ──────────────────────────────────────────── -->
+    <style name="TextAppearance.BrandChip" parent="TextAppearance.LabelMedium">
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="TextAppearance.ScreenTitle" parent="TextAppearance.HeadlineMedium">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.ScreenSubtitle" parent="TextAppearance.BodyMedium">
+        <item name="android:textColor">@color/neutral_var_50</item>
+    </style>
+
+    <style name="TextAppearance.Button" parent="TextAppearance.LabelLarge">
+        <item name="android:textColor">@color/on_primary</item>
+    </style>
+
+    <style name="TextAppearance.Link" parent="TextAppearance.BodyMedium">
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+</resources>
+
+

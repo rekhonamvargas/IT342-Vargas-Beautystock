@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { authApi, productApi } from '@/services/api'
 import { useAuthStore, useDashboardStore } from '@/store/auth'
 import { LocationForm } from './LocationForm'
@@ -7,8 +8,10 @@ import { ProductCard } from './ProductCard'
 import { AddProductForm } from './AddProductForm'
 
 export function Dashboard() {
+  const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
   const setUser = useAuthStore((state) => state.setUser)
+  const clearUser = useAuthStore((state) => state.clearUser)
   const isLoading = useAuthStore((state) => state.isLoading)
   const setIsLoading = useAuthStore((state) => state.setIsLoading)
 
@@ -116,6 +119,18 @@ export function Dashboard() {
     )
   }
 
+  const handleLogout = async () => {
+    try {
+      await authApi.logout()
+    } catch (err) {
+      console.error('Logout request failed:', err)
+    } finally {
+      localStorage.removeItem('token')
+      clearUser()
+      navigate('/login', { replace: true })
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-cream-50">
@@ -154,12 +169,20 @@ export function Dashboard() {
                 {user.role === 'ROLE_YOUTH' ? '🌸 Youth' : '✨ Adult'} • {user.city ? `📍 ${user.city}` : 'City not set'}
               </p>
             </div>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="btn-primary"
-            >
-              + Add Product
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg border border-rose-200 text-rose-700 bg-white hover:bg-rose-50 transition-colors font-medium"
+              >
+                Logout
+              </button>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="btn-primary"
+              >
+                + Add Product
+              </button>
+            </div>
           </div>
         </div>
 

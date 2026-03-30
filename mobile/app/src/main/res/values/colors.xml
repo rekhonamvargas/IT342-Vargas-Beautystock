@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ════════════════════════════════════════════════════════════════════
+         BEAUTYSTOCK EXACT DESIGN PALETTE (from Compose reference)
+         ════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- ── PRIMARY: Rose Pink (Buttons, Active, Primary Text) ────────────── -->
+    <color name="bs_pink">#C94B6E</color>
+    <color name="bs_pink_light">#FAE8ED</color>
+    <color name="bs_pink_soft">#FDF0F3</color>
+    <color name="bs_pink_border">#F0C0CC</color>
+    
+    <!-- ── SECONDARY: Warm Muted Taupe ─────────────────────────────────── -->
+    <color name="bs_muted">#9E8880</color>
+    <color name="bs_muted_dark">#4A3830</color>
+    <color name="bs_muted_light">#A89890</color>
+    
+    <!-- ── TERTIARY: Gold (Logo, Accents) ──────────────────────────────── -->
+    <color name="bs_gold">#B8860B</color>
+    <color name="bs_gold_light">#FFD9A0</color>
+    <color name="bs_gold_soft">#FEF8E0</color>
+    
+    <!-- ── NEUTRALS: Warm Off-White Palette ────────────────────────────── -->
+    <color name="bs_dark">#1A1008</color>
+    <color name="bs_dark_soft">#2C1810</color>
+    <color name="bs_cream">#F5EDE6</color>
+    <color name="bs_card">#FFFFFF</color>
+    <color name="bs_border">#E8DDD5</color>
+    <color name="bs_bg_light">#F2EDE8</color>
+    
+    <!-- ── STATUS: Green, Orange, Red ─────────────────────────────────── -->
+    <color name="bs_green_valid">#4A8E5F</color>
+    <color name="bs_green_bg">#E6F4ED</color>
+    <color name="bs_orange_warn">#C47010</color>
+    <color name="bs_orange_bg">#FEF2E0</color>
+    <color name="bs_red_error">#B03525</color>
+    <color name="bs_red_bg">#FDECEB</color>
+    
+    <!-- ── M3 ROLE COLORS ────────────────────────────────────────────────── -->
+    <color name="primary">#C94B6E</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#FAE8ED</color>
+    <color name="on_primary_container">#3E0021</color>
+    
+    <color name="secondary">#9E8880</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#F2EDE8</color>
+    <color name="on_secondary_container">#4A3830</color>
+    
+    <color name="tertiary">#B8860B</color>
+    <color name="on_tertiary">#FFFFFF</color>
+    <color name="tertiary_container">#FEF8E0</color>
+    <color name="on_tertiary_container">#3E2200</color>
+    
+    <color name="error">#B03525</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="error_container">#FDECEB</color>
+    <color name="on_error_container">#410002</color>
+    
+    <color name="background">#F5EDE6</color>
+    <color name="on_background">#1A1008</color>
+    <color name="surface">#F5EDE6</color>
+    <color name="on_surface">#1A1008</color>
+    <color name="surface_variant">#F2EDE8</color>
+    <color name="on_surface_variant">#4A3830</color>
+    <color name="outline">#9E8880</color>
+    <color name="outline_variant">#E8DDD5</color>
+    
+    <!-- ── ADDITIONAL: Referenced in text_styles.xml ────────────────────── -->
+    <color name="neutral_10">#1A1008</color>
+    <color name="neutral_20">#2C1810</color>
+    <color name="neutral_50">#9E8880</color>
+    <color name="neutral_60">#A89890</color>
+    <color name="neutral_var_50">#9E8880</color>
+    <color name="neutral_var_60">#A89890</color>
+</resources>

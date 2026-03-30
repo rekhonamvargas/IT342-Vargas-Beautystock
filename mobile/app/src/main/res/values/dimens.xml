@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ════════════════════════════════════════════════════════════════════
+         BEAUTYSTOCK SPACING & SIZING SYSTEM
+         ════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- ── SPACING: Horizontal Padding ────────────────────────────────────── -->
+    <dimen name="bs_padding_xs">4dp</dimen>
+    <dimen name="bs_padding_sm">8dp</dimen>
+    <dimen name="bs_padding_md">12dp</dimen>
+    <dimen name="bs_padding_lg">16dp</dimen>
+    <dimen name="bs_padding_xl">20dp</dimen>
+    <dimen name="bs_padding_xxl">24dp</dimen>
+    
+    <!-- ── SPACING: Vertical Gaps ────────────────────────────────────────── -->
+    <dimen name="bs_gap_xs">4dp</dimen>
+    <dimen name="bs_gap_sm">6dp</dimen>
+    <dimen name="bs_gap_md">8dp</dimen>
+    <dimen name="bs_gap_lg">12dp</dimen>
+    <dimen name="bs_gap_xl">16dp</dimen>
+    <dimen name="bs_gap_xxl">20dp</dimen>
+    
+    <!-- ── COMPONENT HEIGHTS ─────────────────────────────────────────────── -->
+    <dimen name="bs_button_height">50dp</dimen>
+    <dimen name="bs_input_height">52dp</dimen>
+    <dimen name="bs_card_height_product_image">130dp</dimen>
+    
+    <!-- ── ICON SIZES ────────────────────────────────────────────────────── -->
+    <dimen name="bs_icon_size_xs">11dp</dimen>
+    <dimen name="bs_icon_size_sm">14dp</dimen>
+    <dimen name="bs_icon_size_md">16dp</dimen>
+    <dimen name="bs_icon_size_lg">32dp</dimen>
+    <dimen name="bs_icon_size_xl">48dp</dimen>
+    
+    <!-- ── ICON BOX SIZES ────────────────────────────────────────────────── -->
+    <dimen name="bs_icon_box_sm">30dp</dimen>
+    <dimen name="bs_icon_box_md">36dp</dimen>
+    
+    <!-- ── CORNER RADIUS ────────────────────────────────────────────────── -->
+    <dimen name="bs_corner_radius_button">50dp</dimen>
+    <dimen name="bs_corner_radius_card">16dp</dimen>
+    <dimen name="bs_corner_radius_card_sm">14dp</dimen>
+    <dimen name="bs_corner_radius_icon_box">10dp</dimen>
+    <dimen name="bs_corner_radius_chip">20dp</dimen>
+    <dimen name="bs_corner_radius_pill">8dp</dimen>
+    
+    <!-- ── BORDER WIDTHS ────────────────────────────────────────────────── -->
+    <dimen name="bs_border_width_thin">0.5dp</dimen>
+    <dimen name="bs_border_width_normal">1dp</dimen>
+    <dimen name="bs_border_width_thick">2dp</dimen>
+</resources>

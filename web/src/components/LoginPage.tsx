@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { authApi } from '@/services/api'
 import { useAuthStore } from '@/store/auth'
 import { GoogleSignInButton } from './GoogleSignInButton'
@@ -17,8 +17,10 @@ const C = {
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const navState = (location.state ?? {}) as { registered?: boolean; email?: string }
   const setUser = useAuthStore((state) => state.setUser)
-  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [formData, setFormData] = useState({ email: navState.email ?? '', password: '' })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -73,6 +75,12 @@ export function LoginPage() {
 
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.55rem', fontWeight: 700, textAlign: 'center', marginBottom: '0.3rem', color: C.dark }}>Welcome back</h2>
         <p style={{ fontSize: '0.82rem', color: C.muted, textAlign: 'center', marginBottom: '1.4rem' }}>Your inventory is ready for you.</p>
+
+        {navState.registered && (
+          <div style={{ background: '#E8F7EE', border: '1px solid #BFE6CC', borderRadius: 8, padding: '0.65rem 0.9rem', fontSize: '0.82rem', color: '#1E7A47', marginBottom: '1rem' }}>
+            Account created successfully. Please sign in with your email and password.
+          </div>
+        )}
 
         {/* Google */}
         <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={(e) => setError(e)} text="signin_with" />

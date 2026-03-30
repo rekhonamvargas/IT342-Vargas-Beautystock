@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen_gradient">
+
+    <!-- Decorative Orbs -->
+    <View
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="-70dp"
+        android:layout_marginEnd="-60dp"
+        android:background="@drawable/bg_orb_primary" />
+
+    <View
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginBottom="-60dp"
+        android:layout_marginStart="-40dp"
+        android:background="@drawable/bg_orb_secondary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Main Content Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:layout_margin="20dp"
+                android:background="@color/bs_card"
+                android:elevation="4dp">
+
+                <!-- Hero Heading -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Your Beauty."
+                        android:textSize="32sp"
+                        android:fontFamily="@font/lora"
+                        android:textStyle="bold"
+                        android:textColor="@color/bs_dark"
+                        android:gravity="center" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="4dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Beautifully"
+                            android:textSize="32sp"
+                            android:fontFamily="@font/lora"
+                            android:textStyle="bold|italic"
+                            android:textColor="@color/bs_pink" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" Organized"
+                            android:textSize="28sp"
+                            android:fontFamily="@font/lora"
+                            android:textStyle="bold"
+                            android:textColor="@color/bs_dark"
+                            android:layout_marginStart="4dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Subtitle -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Organize your beauty collection, track expiration dates, and get personalized recommendations"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/bs_muted"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Feature Cards Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:spacing="12dp"
+                    android:layout_marginBottom="24dp">
+
+                    <!-- Row 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:spacing="20dp">
+                        <!-- Trust Collection -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_card_surface">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🏆"
+                                android:textSize="24sp"
+                                android:layout_marginBottom="6dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Trust"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/poppins"
+                                android:textStyle="bold"
+                                android:textColor="@color/bs_dark"
+                                android:layout_marginBottom="4dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Your Collection"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/poppins"
+                                android:textColor="@color/bs_muted" />
+                        </LinearLayout>
+
+                        <!-- Weather Tips -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_card_surface">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="☀️"
+                                android:textSize="24sp"
+                                android:layout_marginBottom="6dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Weather"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/poppins"
+                                android:textStyle="bold"
+                                android:textColor="@color/bs_dark"
+                                android:layout_marginBottom="4dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Smart Tips"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/poppins"
+                                android:textColor="@color/bs_muted" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Row 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:spacing="12dp">
+                        <!-- Favorites -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_card_surface">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="❤️"
+                                android:textSize="24sp"
+                                android:layout_marginBottom="6dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Favorites"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/poppins"
+                                android:textStyle="bold"
+                                android:textColor="@color/bs_dark"
+                                android:layout_marginBottom="4dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Save Your Best"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/poppins"
+                                android:textColor="@color/bs_muted" />
+                        </LinearLayout>
+
+                        <!-- Scents -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_card_surface">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🌸"
+                                android:textSize="24sp"
+                                android:layout_marginBottom="6dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Scents"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/poppins"
+                                android:textStyle="bold"
+                                android:textColor="@color/bs_dark"
+                                android:layout_marginBottom="4dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Explore More"
+                                android:textSize="11sp"
+                                android:fontFamily="@font/poppins"
+                                android:textColor="@color/bs_muted" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- CTA Buttons -->
+                <Button
+                    android:id="@+id/btnGetStarted"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:text="Get Started"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bs_card"
+                    android:fontFamily="@font/poppins"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnSignIn"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_btn_secondary"
+                    android:text="Sign In"
+                    android:textAllCaps="false"
+                    android:textColor="@color/bs_dark"
+                    android:fontFamily="@font/poppins"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

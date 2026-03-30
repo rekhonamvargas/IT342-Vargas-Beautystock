@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authApi } from '@/services/api'
-import { useAuthStore } from '@/store/auth'
 import { GoogleSignInButton } from './GoogleSignInButton'
 
 const C = {
@@ -17,7 +16,6 @@ const C = {
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const setUser = useAuthStore((state) => state.setUser)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -39,7 +37,6 @@ export function RegisterPage() {
       setIsLoading(true)
       const response = await authApi.googleAuth(idToken, formData.ageRange)
       localStorage.setItem('token', response.data.token)
-      setUser(response.data.user)
       navigate('/dashboard')
     } catch (err: any) {
       const msg = typeof err.response?.data === 'string' ? err.response.data : err.response?.data?.message || 'Google sign-up failed'
@@ -59,10 +56,14 @@ export function RegisterPage() {
     }
     try {
       setIsLoading(true)
-      const response = await authApi.register(formData)
-      localStorage.setItem('token', response.data.token)
-      setUser(response.data.user)
-      navigate('/dashboard')
+      await authApi.register(formData)
+      navigate('/login', {
+        replace: true,
+        state: {
+          registered: true,
+          email: formData.email,
+        },
+      })
     } catch (err: any) {
       const raw = err.response?.data
       setError(typeof raw === 'string' ? raw : raw?.message || 'Registration failed')

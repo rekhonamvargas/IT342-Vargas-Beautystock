@@ -1,8 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = typeof window !== 'undefined' && (window as any).location.hostname === 'localhost' 
-  ? '/api' 
-  : 'http://localhost:8080/api'
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
