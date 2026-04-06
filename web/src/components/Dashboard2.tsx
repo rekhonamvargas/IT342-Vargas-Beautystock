@@ -22,6 +22,14 @@ export function Dashboard() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [activeTab, setActiveTab] = useState<'all' | 'expiring' | 'favorites'>('all')
 
+  const formatPeso = (value: number) =>
+    new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value)
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -178,7 +186,7 @@ export function Dashboard() {
               <p className="text-gray-600 text-sm">Expired</p>
             </div>
             <div className="card text-center">
-              <p className="text-3xl font-bold text-rose-500">${stats.totalSpent.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-rose-500">{formatPeso(stats.totalSpent)}</p>
               <p className="text-gray-600 text-sm">Total Spent</p>
             </div>
           </div>

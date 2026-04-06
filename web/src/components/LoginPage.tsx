@@ -1,30 +1,17 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { authApi } from '@/services/api'
 import { useAuthStore } from '@/store/auth'
 import { GoogleSignInButton } from './GoogleSignInButton'
 
-const C = {
-  bg: '#F2EDE8',
-  card: '#FFFFFF',
-  border: '#E8DDD5',
-  pink: '#C94B6E',
-  pinkBg: '#FAE8ED',
-  gold: '#D4921E',
-  dark: '#1A1008',
-  muted: '#8A7A72',
-}
-
 export function LoginPage() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const navState = (location.state ?? {}) as { registered?: boolean; email?: string }
   const setUser = useAuthStore((state) => state.setUser)
-  const [formData, setFormData] = useState({ email: navState.email ?? '', password: '' })
+  const [formData, setFormData] = useState({ email: '', password: '' })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
@@ -38,7 +25,10 @@ export function LoginPage() {
       setUser(response.data.user)
       navigate('/dashboard')
     } catch (err: any) {
-      const msg = typeof err.response?.data === 'string' ? err.response.data : err.response?.data?.message || 'Google login failed'
+      const msg =
+        typeof err.response?.data === 'string'
+          ? err.response.data
+          : err.response?.data?.message || 'Google login failed'
       setError(msg)
     } finally {
       setIsLoading(false)
@@ -55,118 +45,83 @@ export function LoginPage() {
       setUser(response.data.user)
       navigate('/dashboard')
     } catch (err: any) {
-      const raw = err.response?.data
-      const msg = typeof raw === 'string' ? raw : raw?.message || 'Invalid email or password'
-      setError(msg)
+      setError(err.response?.data || 'Login failed')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div style={{ background: C.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.5rem 1rem', fontFamily: "'Nunito', sans-serif" }}>
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 20, padding: '2.2rem', width: '100%', maxWidth: 420, boxShadow: '0 4px 24px rgba(26,16,8,0.06)' }}>
-
+    <div className="min-h-screen flex items-center justify-center bg-cream px-4 py-8">
+      <div className="w-full max-w-[420px] rounded-2xl border border-cream-200 bg-white px-5 py-6 shadow-[0_4px_24px_rgba(26,16,8,.06)]">
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginBottom: '1.4rem' }}>
-          <span style={{ color: C.pink, fontSize: '1.1rem' }}>✦</span>
-          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.1rem', fontWeight: 700, color: C.gold }}>BeautyStock</span>
-        </div>
-
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.55rem', fontWeight: 700, textAlign: 'center', marginBottom: '0.3rem', color: C.dark }}>Welcome back</h2>
-        <p style={{ fontSize: '0.82rem', color: C.muted, textAlign: 'center', marginBottom: '1.4rem' }}>Your inventory is ready for you.</p>
-
-        {navState.registered && (
-          <div style={{ background: '#E8F7EE', border: '1px solid #BFE6CC', borderRadius: 8, padding: '0.65rem 0.9rem', fontSize: '0.82rem', color: '#1E7A47', marginBottom: '1rem' }}>
-            Account created successfully. Please sign in with your email and password.
+        <div className="text-center mb-5">
+          <div className="flex items-center justify-center gap-1.5 mb-2">
+            <span className="text-pink text-xs">✦</span>
+            <span className="font-serif font-bold text-[#C88A1A] text-sm">BeautyStock</span>
           </div>
-        )}
+          <h2 className="font-serif text-[44px] leading-none font-bold text-dark">Welcome back</h2>
+          <p className="text-muted text-[12px] mt-2">Your inventory is ready for you.</p>
+        </div>
 
         {/* Google */}
-        <GoogleSignInButton onSuccess={handleGoogleSuccess} onError={(e) => setError(e)} text="signin_with" />
-
-        {/* Divider */}
-        <div style={{ textAlign: 'center', color: C.muted, fontSize: '0.73rem', margin: '0.7rem 0', position: 'relative' }}>
-          <span style={{ position: 'relative', zIndex: 1, background: C.card, padding: '0 0.6rem' }}>or</span>
-          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 1, background: C.border, zIndex: 0 }} />
-        </div>
+        <GoogleSignInButton
+          onSuccess={handleGoogleSuccess}
+          onError={(err) => setError(err)}
+          text="signin_with"
+        />
 
         {error && (
-          <div style={{ background: '#FDECEA', border: '1px solid #F5C6C0', borderRadius: 8, padding: '0.65rem 0.9rem', fontSize: '0.82rem', color: '#B03525', marginBottom: '1rem' }}>
+          <div className="mt-3 p-2.5 bg-red-50 border border-red-100 rounded-lg text-red text-xs">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          {/* Email */}
-          <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: C.dark, marginBottom: '0.38rem', letterSpacing: '0.01em' }}>Email Address</label>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="mt-1 space-y-3">
+          <div className="fg">
+            <label className="text-[11px] font-semibold text-dark">Email Address</label>
             <input
-              type="email" name="email" value={formData.email} onChange={handleChange}
-              placeholder="you@example.com" disabled={isLoading}
-              style={inputStyle}
-              onFocus={(e) => (e.target.style.borderColor = C.pink)}
-              onBlur={(e) => (e.target.style.borderColor = C.border)}
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="rekhona@example.com"
+              disabled={isLoading}
+              required
+              className="h-11 rounded-xl text-[13px]"
             />
           </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: '0.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: C.dark, marginBottom: '0.38rem', letterSpacing: '0.01em' }}>Password</label>
+          <div className="fg">
+            <label className="text-[11px] font-semibold text-dark">Password</label>
             <input
-              type="password" name="password" value={formData.password} onChange={handleChange}
-              placeholder="••••••••" disabled={isLoading}
-              style={inputStyle}
-              onFocus={(e) => (e.target.style.borderColor = C.pink)}
-              onBlur={(e) => (e.target.style.borderColor = C.border)}
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="••••••••"
+              disabled={isLoading}
+              required
+              className="h-11 rounded-xl text-[13px]"
             />
           </div>
-
-          {/* Forgot */}
-          <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-            <a href="#" style={{ fontSize: '0.77rem', color: C.pink, fontWeight: 600, textDecoration: 'none' }}>Forgot password?</a>
+          <div className="text-right pt-0.5">
+            <button type="button" className="text-[11px] text-pink font-semibold hover:underline">
+              Forgot password?
+            </button>
           </div>
-
-          <button type="submit" disabled={isLoading} style={btnPinkStyle}>
-            {isLoading ? 'Signing in…' : 'Sign In'}
+          <button type="submit" disabled={isLoading} className="btn-pink w-full h-11 rounded-xl text-sm">
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', fontSize: '0.79rem', color: C.muted, marginTop: '0.95rem' }}>
+        <p className="text-center text-muted text-[12px] mt-4">
           Don't have an account?{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/register') }} style={{ color: C.pink, fontWeight: 700, textDecoration: 'none' }}>Create one</a>
+          <Link to="/register" className="text-pink font-semibold hover:underline">
+            Create one
+          </Link>
         </p>
       </div>
     </div>
   )
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '0.68rem 0.9rem',
-  border: `1.5px solid #E8DDD5`,
-  borderRadius: 10,
-  fontFamily: "'Nunito', sans-serif",
-  fontSize: '0.875rem',
-  color: '#1A1008',
-  background: 'white',
-  outline: 'none',
-  boxSizing: 'border-box',
-  transition: 'border-color 0.15s',
-}
-
-const btnPinkStyle: React.CSSProperties = {
-  width: '100%',
-  background: '#C94B6E',
-  color: 'white',
-  border: 'none',
-  borderRadius: 10,
-  padding: '0.78rem',
-  fontSize: '0.9rem',
-  fontWeight: 700,
-  cursor: 'pointer',
-  fontFamily: "'Nunito', sans-serif",
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
 }

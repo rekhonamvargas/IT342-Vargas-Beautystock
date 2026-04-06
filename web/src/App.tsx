@@ -1,44 +1,101 @@
+import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { Dashboard } from '@/components/Dashboard'
+import { useAuthStore } from '@/store/auth'
+import { authApi } from '@/services/api'
+import { Layout } from '@/components/Layout'
+import { LandingPage } from '@/components/LandingPage'
 import { LoginPage } from '@/components/LoginPage'
 import { RegisterPage } from '@/components/RegisterPage'
-import './App.css'
+import { Dashboard } from '@/components/Dashboard'
+import { SkincareAdvice } from '@/components/SkincareAdvice'
+import { ProductsPage } from '@/components/ProductsPage'
+import { AddProductPage } from '@/components/AddProductPage'
+import { ProductDetail } from '@/components/ProductDetail'
+import { FavoritesPage } from '@/components/FavoritesPage'
+import { ProfilePage } from '@/components/ProfilePage'
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function AuthLoader({ children }: { children: React.ReactNode }) {
+  const { user, setUser, setIsLoading } = useAuthStore()
   const token = localStorage.getItem('token')
 
-  if (!token) {
-    return <Navigate to="/login" replace />
-  }
+  useEffect(() => {
+    if (token && !user) {
+      setIsLoading(true)
+      authApi
+        .getMe()
+        .then((res) => setUser(res.data))
+        .catch(() => localStorage.removeItem('token'))
+        .finally(() => setIsLoading(false))
+    }
+  }, [token])
 
   return <>{children}</>
 }
 
-function App() {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const token = localStorage.getItem('token')
+  if (!token) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
 
+function PublicOnly({ children }: { children: React.ReactNode }) {
+  const token = localStorage.getItem('token')
+  if (token) return <Navigate to="/dashboard" replace />
+  return <>{children}</>
+}
+
+function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+      <AuthLoader>
+        <Routes>
+          {/* Public routes */}
+          <Route
+            path="/"
+            element={
+              <PublicOnly>
+                <LandingPage />
+              </PublicOnly>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PublicOnly>
+                <LoginPage />
+              </PublicOnly>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicOnly>
+                <RegisterPage />
+              </PublicOnly>
+            }
+          />
+
+          {/* Protected routes with Layout */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/new" element={<AddProductPage />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/skincare-advice" element={<SkincareAdvice />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthLoader>
     </Router>
   )
 }

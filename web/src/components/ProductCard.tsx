@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { productApi, favoriteApi } from '@/services/api'
+import { ProductImage } from './ProductImage'
 
 interface ProductCardProps {
   id: number
@@ -29,6 +30,13 @@ export function ProductCard({
   onFavoriteToggle,
 }: ProductCardProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const formatPrice = (value: number) =>
+    new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value)
 
   const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this product?')) {
@@ -62,11 +70,13 @@ export function ProductCard({
 
   return (
     <div className="card hover:shadow-md transition-shadow">
-      {imageUrl && (
-        <div className="mb-4 bg-gray-100 rounded-lg overflow-hidden h-40 flex items-center justify-center">
-          <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
-        </div>
-      )}
+      <ProductImage
+        src={imageUrl}
+        alt={name}
+        className="mb-4 rounded-lg overflow-hidden h-40"
+        placeholderClassName="bg-gray-100 text-muted rounded-lg h-40"
+        placeholderText="No image"
+      />
 
       {isExpired && (
         <div className="mb-2 px-2 py-1 bg-red-100 border border-red-300 rounded text-red-700 text-xs font-medium">
@@ -86,7 +96,7 @@ export function ProductCard({
       </div>
 
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-lg font-bold text-rose-600">${price.toFixed(2)}</span>
+        <span className="text-lg font-bold text-rose-600">{formatPrice(price)}</span>
         {expirationDate && (
           <span className="text-xs text-gray-500">Exp: {new Date(expirationDate).toLocaleDateString()}</span>
         )}

@@ -51,6 +51,7 @@ export const useWeatherStore = create<WeatherStore>((set) => ({
 interface DashboardStats {
   totalProducts: number
   expiringCount: number
+  runningOutCount: number
   expiredCount: number
   favoritesCount: number
   totalSpent: number

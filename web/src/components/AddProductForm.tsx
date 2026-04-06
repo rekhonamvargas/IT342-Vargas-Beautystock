@@ -118,7 +118,7 @@ export function AddProductForm({ onSuccess, onCancel }: AddProductFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₱) *</label>
             <input
               type="number"
               name="price"

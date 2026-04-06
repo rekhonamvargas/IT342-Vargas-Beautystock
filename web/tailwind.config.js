@@ -7,6 +7,32 @@ export default {
   theme: {
     extend: {
       colors: {
+        pink: {
+          DEFAULT: '#C94B6E',
+          50: '#FAE8ED',
+          100: '#F5D1DD',
+          200: '#EAA3BC',
+          300: '#DF759B',
+          400: '#D44779',
+          500: '#C94B6E',
+          600: '#B13B5F',
+          700: '#8F2E4C',
+        },
+        dark: '#1A1008',
+        muted: '#8A7A72',
+        gold: {
+          DEFAULT: '#D4921E',
+          50: '#FEF7E8',
+          100: '#FCECC8',
+          200: '#F9D994',
+          300: '#F4C35D',
+          400: '#E9AB33',
+          500: '#D4921E',
+          600: '#B07618',
+          700: '#8A5B14',
+        },
+        orange: '#F59E0B',
+        red: '#DC2626',
         // Soft pastel feminine palette
         rose: {
           50: '#fdf2f8',
@@ -21,6 +47,7 @@ export default {
           900: '#831843',
         },
         cream: {
+          DEFAULT: '#F2EDE8',
           50: '#fffbf0',
           100: '#fef3c7',
           200: '#fde68a',

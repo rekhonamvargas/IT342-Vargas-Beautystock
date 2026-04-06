@@ -32,7 +32,9 @@ apiClient.interceptors.response.use(
 
     // If we get 401 or 403 on an authenticated request, token is invalid
     const status = error.response?.status
-    if ((status === 401 || status === 403) && error.config?.url !== '/v1/auth/login' && error.config?.url !== '/v1/auth/register') {
+    if ((status === 401 || status === 403)
+      && error.config?.url !== '/v1/auth/login'
+      && error.config?.url !== '/v1/auth/register') {
       localStorage.removeItem('token')
     }
 

@@ -1,335 +1,318 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { authApi, productApi } from '@/services/api'
-import { useAuthStore, useDashboardStore } from '@/store/auth'
-import { LocationForm } from './LocationForm'
-import { WeatherDisplay } from './WeatherDisplay'
-import { ProductCard } from './ProductCard'
-import { AddProductForm } from './AddProductForm'
+import { Link } from 'react-router-dom'
+import { useAuthStore, useWeatherStore, useDashboardStore } from '@/store/auth'
+import { productApi, recommendationApi, favoriteApi } from '@/services/api'
+import { ProductImage } from './ProductImage'
+
+interface Product {
+  id: number
+  name: string
+  brand: string
+  category: string
+  price: number
+  imageUrl: string | null
+  expirationDate: string | null
+  isExpired: boolean
+  isFavorite: boolean
+  isExpiringWithin15Days: boolean
+}
 
 export function Dashboard() {
-  const navigate = useNavigate()
-  const user = useAuthStore((state) => state.user)
-  const setUser = useAuthStore((state) => state.setUser)
-  const clearUser = useAuthStore((state) => state.clearUser)
-  const isLoading = useAuthStore((state) => state.isLoading)
-  const setIsLoading = useAuthStore((state) => state.setIsLoading)
+  const { user } = useAuthStore()
+  const { weather, error: weatherError, setWeather, setError: setWeatherError } = useWeatherStore()
+  const { stats, setStats } = useDashboardStore()
+  const [recentProducts, setRecentProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [weatherLoading, setWeatherLoading] = useState(false)
+  const [togglingFavorite, setTogglingFavorite] = useState<number | null>(null)
 
-  const stats = useDashboardStore((state) => state.stats)
-  const setStats = useDashboardStore((state) => state.setStats)
-  const setStatsLoading = useDashboardStore((state) => state.setIsLoading)
+  const productPastelBackgrounds = ['bg-[#F8E6EB]', 'bg-[#E7F0EB]', 'bg-[#EDE7F8]', 'bg-[#FBEEDC]']
 
-  const [products, setProducts] = useState<any[]>([])
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [activeTab, setActiveTab] = useState<'all' | 'expiring' | 'favorites'>('all')
+  const toTitleCase = (value: string) =>
+    value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ')
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setIsLoading(true)
-        const response = await authApi.getMe()
-        setUser(response.data)
-      } catch (err) {
-        console.error('Failed to fetch user:', err)
-        localStorage.removeItem('token')
-        window.location.href = '/login'
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchUser()
-  }, [setUser, setIsLoading])
+  const registeredName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
+  const fallbackName = user?.email?.split('@')[0] || 'User'
+  const displayName = toTitleCase(registeredName || fallbackName)
 
   useEffect(() => {
-    if (!user) return
+    loadData()
+  }, [])
 
-    const fetchData = async () => {
-      try {
-        setStatsLoading(true)
-        const [productsRes, statsRes] = await Promise.all([
-          productApi.getAll(),
-          productApi.getDashboard(),
-        ])
-        setProducts(productsRes.data)
-        setFilteredProducts(productsRes.data)
-        setStats(statsRes.data)
-      } catch (err) {
-        console.error('Failed to fetch data:', err)
-      } finally {
-        setStatsLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [user, setStats, setStatsLoading])
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    if (query.trim()) {
-      const filtered = products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query.toLowerCase()) ||
-          p.brand.toLowerCase().includes(query.toLowerCase())
-      )
-      setFilteredProducts(filtered)
-    } else {
-      setFilteredProducts(products)
-    }
-  }
-
-  const handleTabChange = (tab: 'all' | 'expiring' | 'favorites') => {
-    setActiveTab(tab)
-    setSearchQuery('')
-
-    if (tab === 'expiring') {
-      setFilteredProducts(products.filter((p) => p.isExpiringWithin15Days || p.isExpired))
-    } else if (tab === 'favorites') {
-      setFilteredProducts(products.filter((p) => p.isFavorite))
-    } else {
-      setFilteredProducts(products)
-    }
-  }
-
-  const handleProductDelete = (id: number) => {
-    setProducts(products.filter((p) => p.id !== id))
-    setFilteredProducts(filteredProducts.filter((p) => p.id !== id))
-  }
-
-  const handleProductAdded = () => {
-    setShowAddForm(false)
-    productApi.getAll().then((res) => {
-      setProducts(res.data)
-      setFilteredProducts(res.data)
-    })
-    productApi.getDashboard().then((res) => {
-      setStats(res.data)
-    })
-  }
-
-  const handleFavoriteToggle = (id: number) => {
-    const updatedProducts = products.map((p) =>
-      p.id === id ? { ...p, isFavorite: !p.isFavorite } : p
-    )
-    setProducts(updatedProducts)
-    setFilteredProducts(
-      filteredProducts.map((p) => (p.id === id ? { ...p, isFavorite: !p.isFavorite } : p))
-    )
-  }
-
-  const handleLogout = async () => {
+  const loadWeatherAdvice = async () => {
     try {
-      await authApi.logout()
-    } catch (err) {
-      console.error('Logout request failed:', err)
+      setWeatherLoading(true)
+      setWeatherError(null)
+
+      const weatherRes =
+        user?.role === 'ROLE_YOUTH'
+          ? await recommendationApi.getYouthWeather()
+          : await recommendationApi.getAdultWeather()
+
+      setWeather(weatherRes.data)
+    } catch {
+      setWeather(null)
+      setWeatherError('Unable to load weather advice. Set your city in Profile and try again.')
     } finally {
-      localStorage.removeItem('token')
-      clearUser()
-      navigate('/login', { replace: true })
+      setWeatherLoading(false)
     }
   }
 
-  if (isLoading) {
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const [dashRes, prodRes] = await Promise.all([
+        productApi.getDashboard(),
+        productApi.getAll(),
+      ])
+      setStats(dashRes.data)
+      setRecentProducts(prodRes.data.slice(0, 4))
+
+      await loadWeatherAdvice()
+    } catch (err) {
+      console.error('Dashboard load error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggleFavorite = async (e: React.MouseEvent, productId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const product = recentProducts.find(p => p.id === productId)
+    if (!product) return
+
+    try {
+      setTogglingFavorite(productId)
+      const nextIsFavorite = !product.isFavorite
+
+      console.log(`Toggling favorite for product ${productId}: ${product.isFavorite} → ${nextIsFavorite}`)
+
+      // Optimistic update
+      setRecentProducts((prev) =>
+        prev.map((p) =>
+          p.id === productId ? { ...p, isFavorite: nextIsFavorite } : p
+        )
+      )
+
+      // API call
+      if (nextIsFavorite) {
+        console.log(`Adding to favorites: ${productId}`)
+        await favoriteApi.add(productId)
+      } else {
+        console.log(`Removing from favorites: ${productId}`)
+        await favoriteApi.remove(productId)
+      }
+      console.log(`Successfully toggled favorite for product ${productId}`)
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err)
+      // Rollback on error
+      setRecentProducts((prev) =>
+        prev.map((p) =>
+          p.id === productId ? { ...p, isFavorite: product.isFavorite } : p
+        )
+      )
+    } finally {
+      setTogglingFavorite(null)
+    }
+  }
+
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
+
+  const renderWavingText = (text: string) =>
+    Array.from(text).map((character, index) => (
+      <span
+        key={`${character}-${index}`}
+        className="hello-wave"
+        style={{ animationDelay: `${index * 0.08}s` }}
+      >
+        {character === ' ' ? '\u00A0' : character}
+      </span>
+    ))
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-cream-50">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <p className="text-xl text-gray-700">Loading your dashboard...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return null
-  }
-
-  if (showAddForm) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-cream-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <AddProductForm onSuccess={handleProductAdded} onCancel={() => setShowAddForm(false)} />
+          <div className="w-8 h-8 border-2 border-pink border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-muted text-sm">Loading your dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-cream-50 py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
+    <div className="space-y-5 w-full font-sans">
+      {/* Header */}
+      <div className="flex w-full items-start justify-between gap-6 pt-1">
+        <div className="min-w-0 flex-1">
+          <h1
+            className="hello-title text-pink"
+          >
+            <span className="hello-wave-wrap">{renderWavingText(`Hello, ${displayName} ✨`)}</span>
+          </h1>
+        </div>
+        <Link to="/products/new" className="btn-pink px-5 py-2 rounded-full text-[11px] mt-1">
+          + Add Product
+        </Link>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="stat-card py-4 border-[#E5CF83]">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-md bg-pink-50 flex items-center justify-center text-[11px]">🧴</div>
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Welcome, {user.firstName}! 💄
-              </h1>
-              <p className="text-gray-600">
-                {user.role === 'ROLE_YOUTH' ? '🌸 Youth' : '✨ Adult'} • {user.city ? `📍 ${user.city}` : 'City not set'}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-lg border border-rose-200 text-rose-700 bg-white hover:bg-rose-50 transition-colors font-medium"
-              >
-                Logout
-              </button>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="btn-primary"
-              >
-                + Add Product
-              </button>
+              <div className="text-2xl font-bold text-dark leading-none">{stats?.totalProducts ?? 0}</div>
+              <div className="text-xs text-muted mt-1">Total Products</div>
             </div>
           </div>
         </div>
+        <div className="stat-card py-4 border-[#E5CF83]">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-md bg-[#F7EDFF] flex items-center justify-center text-[11px]">❤️</div>
+            <div>
+              <div className="text-2xl font-bold text-dark leading-none">{stats?.favoritesCount ?? 0}</div>
+              <div className="text-xs text-muted mt-1">Favorites</div>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card py-4 border-[#E5CF83]">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-md bg-orange-50 flex items-center justify-center text-[11px]">⚠️</div>
+            <div>
+              <div className="text-2xl font-bold text-orange leading-none">{stats?.expiringCount ?? 0}</div>
+              <div className="text-xs text-muted mt-1">Expiring Soon</div>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card py-4 border-[#E5CF83]">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-md bg-[#FFE8EA] flex items-center justify-center text-[11px]">↘</div>
+            <div>
+              <div className="text-2xl font-bold text-[#D94A6D] leading-none">{stats?.runningOutCount ?? 0}</div>
+              <div className="text-xs text-muted mt-1">Running Out</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* Dashboard Stats */}
-        {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            <div className="card text-center">
-              <p className="text-3xl font-bold text-rose-600">{stats.totalProducts}</p>
-              <p className="text-gray-600 text-sm">Total Products</p>
-            </div>
-            <div className="card text-center">
-              <p className="text-3xl font-bold text-yellow-600">{stats.expiringCount}</p>
-              <p className="text-gray-600 text-sm">Expiring Soon</p>
-            </div>
-            <div className="card text-center">
-              <p className="text-3xl font-bold text-red-600">{stats.expiredCount}</p>
-              <p className="text-gray-600 text-sm">Expired</p>
-            </div>
-            <div className="card text-center">
-              <p className="text-3xl font-bold text-rose-500">${stats.totalSpent.toFixed(2)}</p>
-              <p className="text-gray-600 text-sm">Total Spent</p>
-            </div>
+      {/* Weather Card */}
+      <div className="rounded-2xl border border-[#E5CF83] bg-white p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="font-semibold text-sm text-dark flex items-center gap-2">
+              ☁️ {user?.role === 'ROLE_YOUTH' ? 'Youth' : 'Adult'} Skincare Advice
+            </h3>
+
+            {weatherLoading ? (
+              <p className="text-muted text-xs mt-2">Loading weather advice...</p>
+            ) : weather ? (
+              <p className="text-muted text-xs mt-1 flex items-center gap-4">
+                <span>🌡 {weather.temperature}°C</span>
+                <span>💧 {weather.humidity}%</span>
+                <span>{weather.city}</span>
+              </p>
+            ) : (
+              <p className="text-muted text-xs mt-1">No weather data yet.</p>
+            )}
+          </div>
+
+          <button
+            onClick={loadWeatherAdvice}
+            className="text-[11px] font-semibold text-pink hover:underline"
+            type="button"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <div className="mt-3 rounded-md border border-pink-200 bg-pink-50 px-3 py-2">
+          <p className="text-[11px] text-pink-700 leading-relaxed">
+            {weather?.advice || weatherError || 'Set your city in Profile to load weather-based skincare advice.'}
+          </p>
+        </div>
+      </div>
+
+      {/* Recent Products */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[24px] font-bold text-pink">Recent Products</h2>
+          <Link to="/products" className="text-xs font-semibold text-pink hover:underline">
+            View all →
+          </Link>
+        </div>
+
+        {recentProducts.length === 0 ? (
+          <div className="rounded-2xl border border-[#E5CF83] bg-white text-center py-14 px-6 min-h-[320px] flex flex-col items-center justify-center">
+            <div className="text-4xl mb-4">📦</div>
+            <h3 className="text-4xl leading-tight font-bold text-dark mb-2">No products yet</h3>
+            <p className="text-muted text-xl leading-tight mb-7">Start by adding your first beauty product</p>
+            <Link to="/products/new" className="btn-pink px-8 py-3 rounded-xl text-base">+ Add Product</Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {recentProducts.slice(0, 3).map((product, idx) => (
+              <div key={product.id} className="pc rounded-xl border border-cream-200 overflow-hidden">
+                <div className={`aspect-[16/10] ${productPastelBackgrounds[idx % productPastelBackgrounds.length]} flex flex-col items-center justify-center overflow-hidden relative`}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      toggleFavorite(e, product.id)
+                    }}
+                    disabled={togglingFavorite === product.id}
+                    className="absolute top-2 right-2 text-lg hover:scale-125 transition-transform disabled:opacity-50 z-10"
+                    style={{
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.3), -2px -2px 4px rgba(255,255,255,0.5)',
+                      filter: 'drop-shadow(1px 1px 2px rgba(200,100,100,0.4))',
+                    }}
+                    title={product.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                  >
+                    {product.isFavorite ? '❤️' : '♡'}
+                  </button>
+                  <Link to={`/products/${product.id}`} className="block w-full h-full flex items-center justify-center">
+                    <ProductImage
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-full"
+                      placeholderClassName="bg-white/60 text-muted"
+                      placeholderText="No image"
+                    />
+                  </Link>
+                </div>
+                <div className="p-3 space-y-2">
+                  <Link to={`/products/${product.id}`} className="block">
+                    <p className="text-[10px] text-pink font-semibold uppercase tracking-wide">{product.brand}</p>
+                    <p className="text-sm font-semibold text-dark mt-1 line-clamp-1">{product.name}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-sm font-bold text-dark">{formatPrice(product.price)}</span>
+                      {product.isExpiringWithin15Days && !product.isExpired && (
+                        <span className="text-[10px] bg-orange-50 text-orange px-2 py-0.5 rounded-full font-semibold">Expiring</span>
+                      )}
+                      {product.isExpired && (
+                        <span className="text-[10px] bg-red-50 text-red px-2 py-0.5 rounded-full font-semibold">Expired</span>
+                      )}
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* Weather Section */}
-          {user.city && (
-            <div className="lg:col-span-2">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Weather-Based Beauty Tips</h2>
-              <WeatherDisplay userRole={user.role} />
-            </div>
-          )}
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {!user.city ? (
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Get Started</h3>
-                <LocationForm
-                  onSuccess={() => {
-                    location.reload()
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Location</h3>
-                <LocationForm
-                  onSuccess={() => {
-                    location.reload()
-                  }}
-                />
-              </div>
-            )}
-
-            {/* User Info Card */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile</h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-gray-600">Email</p>
-                  <p className="text-gray-900 font-medium break-all text-sm">{user.email}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Role</p>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    user.role === 'ROLE_YOUTH'
-                      ? 'bg-rose-100 text-rose-700'
-                      : 'bg-sage-100 text-sage-700'
-                  }`}>
-                    {user.role === 'ROLE_YOUTH' ? '🌸 Youth' : '✨ Adult'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Products Section */}
-        <div>
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">My Products</h2>
-
-            {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-gray-200">
-              <button
-                onClick={() => handleTabChange('all')}
-                className={`px-4 py-2 font-medium transition-colors ${
-                  activeTab === 'all'
-                    ? 'border-b-2 border-rose-500 text-rose-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                All ({products.length})
-              </button>
-              <button
-                onClick={() => handleTabChange('expiring')}
-                className={`px-4 py-2 font-medium transition-colors ${
-                  activeTab === 'expiring'
-                    ? 'border-b-2 border-rose-500 text-rose-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Expiring ({stats?.expiringCount || 0})
-              </button>
-              <button
-                onClick={() => handleTabChange('favorites')}
-                className={`px-4 py-2 font-medium transition-colors ${
-                  activeTab === 'favorites'
-                    ? 'border-b-2 border-rose-500 text-rose-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Saved ({stats?.favoritesCount || 0})
-              </button>
-            </div>
-
-            {/* Search */}
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="input-field mb-6"
-            />
-          </div>
-
-          {/* Product Grid */}
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  {...product}
-                  onDelete={handleProductDelete}
-                  onFavoriteToggle={handleFavoriteToggle}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="card text-center py-12">
-              <p className="text-gray-500 text-lg">No products found. Start by adding your first product! 💄</p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   )
