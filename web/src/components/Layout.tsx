@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
+import LogoutConfirmation from './LogoutConfirmation'
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: '◫' },
@@ -9,6 +11,7 @@ const navLinks = [
 ]
 
 export function Layout() {
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false)
   const { user, clearUser } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
@@ -29,13 +32,27 @@ export function Layout() {
   const displayName = toTitleCase(registeredName || fallbackName)
 
   const handleLogout = () => {
+    setShowLogoutConfirmation(true)
+  }
+
+  const confirmLogout = () => {
     localStorage.removeItem('token')
     clearUser()
+    setShowLogoutConfirmation(false)
     navigate('/login')
+  }
+
+  const cancelLogout = () => {
+    setShowLogoutConfirmation(false)
   }
 
   return (
     <div className="min-h-screen bg-cream">
+      <LogoutConfirmation
+        isOpen={showLogoutConfirmation}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
       {/* Navigation */}
       <nav className="appnav">
         <NavLink to="/dashboard" className="flex items-center gap-2 mr-8">

@@ -19,6 +19,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
   long countByOwnerEmail(String ownerEmail);
   long countByOwnerEmailAndExpirationDateBefore(String ownerEmail, LocalDate date);
+  long countByOwnerEmailAndExpirationDateBetween(String ownerEmail, LocalDate startDate, LocalDate endDate);
 
   @Query("select count(p) from Product p where p.ownerEmail = :ownerEmail and lower(coalesce(p.status, '')) like '%running%'")
   long countRunningLowByOwnerEmail(@Param("ownerEmail") String ownerEmail);

@@ -12,6 +12,7 @@ public class CreateProductDTO {
     private LocalDate expirationDate;
     private LocalDate openedDate;
     private String status;
+    private Integer quantity;
 
     public String getName() {
         return name;
@@ -83,5 +84,13 @@ public class CreateProductDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }

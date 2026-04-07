@@ -49,6 +49,9 @@ public class Product {
     @Column(length = 500)
     private String status;
 
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -168,6 +171,14 @@ public class Product {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public LocalDateTime getCreatedAt() {

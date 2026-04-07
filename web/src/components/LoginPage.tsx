@@ -52,48 +52,59 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream px-4 py-8">
-      <div className="w-full max-w-[420px] rounded-2xl border border-cream-200 bg-white px-5 py-6 shadow-[0_4px_24px_rgba(26,16,8,.06)]">
-        {/* Logo */}
-        <div className="text-center mb-5">
-          <div className="flex items-center justify-center gap-1.5 mb-2">
-            <span className="text-pink text-xs">✦</span>
-            <span className="font-serif font-bold text-[#C88A1A] text-sm">BeautyStock</span>
+    <div className="min-h-screen flex items-center justify-center bg-orange-50 px-4 py-8">
+      <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white px-8 py-10 shadow-lg">
+        {/* Logo Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-1.5 mb-3">
+            <span className="text-pink-500 text-lg">✦</span>
+            <span className="font-serif font-bold text-amber-600 text-base">BeautyStock</span>
           </div>
-          <h2 className="font-serif text-[44px] leading-none font-bold text-dark">Welcome back</h2>
-          <p className="text-muted text-[12px] mt-2">Your inventory is ready for you.</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-1">Welcome back</h1>
+          <p className="text-sm text-gray-500">Your inventory is ready for you.</p>
         </div>
 
-        {/* Google */}
+        {/* Google Sign In */}
         <GoogleSignInButton
           onSuccess={handleGoogleSuccess}
           onError={(err) => setError(err)}
           text="signin_with"
         />
 
+        {/* Divider */}
+        <div className="flex items-center my-6">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="px-3 text-xs font-medium text-gray-500">or</span>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        {/* Error Message */}
         {error && (
-          <div className="mt-3 p-2.5 bg-red-50 border border-red-100 rounded-lg text-red text-xs">
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-medium">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="mt-1 space-y-3">
-          <div className="fg">
-            <label className="text-[11px] font-semibold text-dark">Email Address</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email */}
+          <div>
+            <label className="block text-xs font-bold text-gray-900 mb-2">Email Address</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="rekhona@example.com"
+              placeholder="you@example.com"
               disabled={isLoading}
               required
-              className="h-11 rounded-xl text-[13px]"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
             />
           </div>
-          <div className="fg">
-            <label className="text-[11px] font-semibold text-dark">Password</label>
+
+          {/* Password */}
+          <div>
+            <label className="block text-xs font-bold text-gray-900 mb-2">Password</label>
             <input
               type="password"
               name="password"
@@ -102,22 +113,31 @@ export function LoginPage() {
               placeholder="••••••••"
               disabled={isLoading}
               required
-              className="h-11 rounded-xl text-[13px]"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
             />
           </div>
-          <div className="text-right pt-0.5">
-            <button type="button" className="text-[11px] text-pink font-semibold hover:underline">
+
+          {/* Forgot Password */}
+          <div className="text-right">
+            <button type="button" className="text-xs text-pink-600 font-semibold hover:text-pink-700 transition">
               Forgot password?
             </button>
           </div>
-          <button type="submit" disabled={isLoading} className="btn-pink w-full h-11 rounded-xl text-sm">
+
+          {/* Sign In Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-muted text-[12px] mt-4">
+        {/* Sign Up Link */}
+        <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account?{' '}
-          <Link to="/register" className="text-pink font-semibold hover:underline">
+          <Link to="/register" className="text-pink-600 font-semibold hover:text-pink-700 transition">
             Create one
           </Link>
         </p>
