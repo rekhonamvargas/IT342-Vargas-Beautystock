@@ -13,10 +13,11 @@ import { AddProductPage } from '@/components/AddProductPage'
 import { ProductDetail } from '@/components/ProductDetail'
 import { FavoritesPage } from '@/components/FavoritesPage'
 import { ProfilePage } from '@/components/ProfilePage'
+import OAuth2CallbackPage from '@/components/OAuth2CallbackPage'
 
 function AuthLoader({ children }: { children: React.ReactNode }) {
   const { user, setUser, setIsLoading } = useAuthStore()
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('authToken') || localStorage.getItem('token')
 
   useEffect(() => {
     if (token && !user) {
@@ -24,7 +25,10 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
       authApi
         .getMe()
         .then((res) => setUser(res.data))
-        .catch(() => localStorage.removeItem('token'))
+        .catch(() => {
+          localStorage.removeItem('authToken')
+          localStorage.removeItem('token')
+        })
         .finally(() => setIsLoading(false))
     }
   }, [token])
@@ -33,13 +37,13 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('authToken') || localStorage.getItem('token')
   if (!token) return <Navigate to="/login" replace />
   return <>{children}</>
 }
 
 function PublicOnly({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('authToken') || localStorage.getItem('token')
   if (token) return <Navigate to="/dashboard" replace />
   return <>{children}</>
 }
@@ -73,6 +77,10 @@ function App() {
                 <RegisterPage />
               </PublicOnly>
             }
+          />
+          <Route
+            path="/oauth2/callback"
+            element={<OAuth2CallbackPage />}
           />
 
           {/* Protected routes with Layout */}

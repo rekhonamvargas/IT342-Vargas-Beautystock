@@ -11,7 +11,7 @@ const apiClient = axios.create({
 
 // Add token to requests if available
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('authToken') || localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -36,6 +36,7 @@ apiClient.interceptors.response.use(
       && error.config?.url !== '/v1/auth/login'
       && error.config?.url !== '/v1/auth/register') {
       localStorage.removeItem('token')
+      localStorage.removeItem('authToken')
     }
 
     return Promise.reject(error)
