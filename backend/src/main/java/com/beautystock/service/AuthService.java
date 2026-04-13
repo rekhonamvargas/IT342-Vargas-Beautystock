@@ -36,6 +36,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -49,11 +50,13 @@ public class AuthService {
     public AuthService(UserRepository userRepository,
                        RefreshTokenRepository refreshTokenRepository,
                        PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager) {
+                       AuthenticationManager authenticationManager,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -83,6 +86,9 @@ public class AuthService {
 
         User saved = userRepository.save(user);
         log.info("User registered: {}", saved.getEmail());
+
+        // Send welcome email
+        emailService.sendWelcomeEmail(saved.getEmail(), saved.getFullName());
 
         String jwt = generateJWT(saved);
         String refresh = createRefreshToken(saved);

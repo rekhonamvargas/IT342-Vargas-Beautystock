@@ -11,16 +11,26 @@ interface User {
 
 interface AuthStore {
   user: User | null
+  token: string | null
   setUser: (user: User) => void
+  setToken: (token: string) => void
   clearUser: () => void
+  logout: () => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
+  token: localStorage.getItem('authToken'),
   setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
+  setToken: (token) => set({ token }),
+  clearUser: () => set({ user: null, token: null }),
+  logout: () => {
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('token')
+    set({ user: null, token: null })
+  },
   isLoading: false,
   setIsLoading: (loading) => set({ isLoading: loading }),
 }))

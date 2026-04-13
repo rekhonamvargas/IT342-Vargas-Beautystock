@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
+import { authApi } from '@/services/api'
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: '◫' },
@@ -9,7 +10,7 @@ const navLinks = [
 ]
 
 export function Layout() {
-  const { user, clearUser } = useAuthStore()
+  const { user, logout } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
   const isAddProductRoute = location.pathname === '/products/new'
@@ -28,10 +29,17 @@ export function Layout() {
   const fallbackName = user?.email?.split('@')[0] || 'Account'
   const displayName = toTitleCase(registeredName || fallbackName)
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    clearUser()
-    navigate('/login')
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint to revoke tokens
+      await authApi.logout()
+    } catch (err) {
+      console.error('Logout error:', err)
+    } finally {
+      // Clear all auth data
+      logout()
+      navigate('/login', { replace: true })
+    }
   }
 
   return (
