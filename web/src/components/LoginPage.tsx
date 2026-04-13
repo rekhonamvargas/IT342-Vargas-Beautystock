@@ -66,8 +66,6 @@ export function LoginPage() {
 
         {/* Google */}
         <GoogleSignInButton
-          onSuccess={handleGoogleSuccess}
-          onError={(err) => setError(err)}
           text="signin_with"
         />
 
