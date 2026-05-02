@@ -1,4 +1,4 @@
-package com.beautystock.shared.util;
+package com.beautystock.infrastructure.util;
 
 import java.security.Key;
 import java.util.Date;

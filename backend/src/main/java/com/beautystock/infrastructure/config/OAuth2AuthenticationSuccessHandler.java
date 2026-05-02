@@ -1,4 +1,4 @@
-package com.beautystock.shared.config;
+package com.beautystock.infrastructure.config;
 
 import java.io.IOException;
 
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import com.beautystock.features.authentication.entity.User;
 import com.beautystock.features.authentication.entity.UserRole;
 import com.beautystock.features.authentication.repository.UserRepository;
-import com.beautystock.shared.util.JwtTokenProvider;
-import com.beautystock.shared.service.EmailService;
+import com.beautystock.infrastructure.util.JwtTokenProvider;
+import com.beautystock.infrastructure.service.EmailService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

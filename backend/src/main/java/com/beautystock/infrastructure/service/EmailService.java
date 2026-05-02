@@ -1,4 +1,4 @@
-package com.beautystock.shared.service;
+package com.beautystock.infrastructure.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

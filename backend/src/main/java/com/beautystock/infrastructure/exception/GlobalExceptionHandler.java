@@ -1,4 +1,4 @@
-package com.beautystock.shared.exception;
+package com.beautystock.infrastructure.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
