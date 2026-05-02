@@ -6,18 +6,17 @@ import jakarta.validation.constraints.Pattern;
 
 public class RegisterDTO {
 
-    @NotBlank(message = "Full name is required")
-    private String fullName;
+    @NotBlank(message = "First name is required")
+    private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    private String lastName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Pattern(
-        regexp = "^(?=.*[A-Z])(?=.*\\d).{8,}$",
-        message = "Password must be at least 8 characters with at least 1 uppercase letter and 1 digit"
-    )
     private String password;
 
     @NotBlank(message = "Confirm password is required")
@@ -28,8 +27,17 @@ public class RegisterDTO {
 
     public RegisterDTO() {}
 
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getFullName() { 
+        return firstName != null && lastName != null 
+            ? firstName + " " + lastName 
+            : (firstName != null ? firstName : "");
+    }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
