@@ -14,6 +14,7 @@ import { ProductDetail } from '@/components/ProductDetail'
 import { FavoritesPage } from '@/components/FavoritesPage'
 import { ProfilePage } from '@/components/ProfilePage'
 import OAuth2CallbackPage from '@/components/OAuth2CallbackPage'
+import RoleSelectionPage from '@/components/RoleSelectionPage'
 
 function AuthLoader({ children }: { children: React.ReactNode }) {
   const { user, setUser, setIsLoading } = useAuthStore()
@@ -81,6 +82,10 @@ function App() {
           <Route
             path="/oauth2/callback"
             element={<OAuth2CallbackPage />}
+          />
+          <Route
+            path="/role-selection"
+            element={<RoleSelectionPage />}
           />
 
           {/* Protected routes with Layout */}
