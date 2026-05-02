@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore, useWeatherStore, useDashboardStore } from '@/store/auth'
 import { productApi, recommendationApi, favoriteApi } from '@/services/api'
-import { ProductImage } from './ProductImage'
+import { ProductImage } from '@/features/products/components/ProductImage'
 
 interface Product {
   id: number

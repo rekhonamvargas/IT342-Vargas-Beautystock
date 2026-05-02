@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { productApi, favoriteApi } from '@/services/api'
-import { ProductImage } from './ProductImage'
+import { ProductImage } from '@/features/products/components/ProductImage'
 
 interface Product {
   id: number
