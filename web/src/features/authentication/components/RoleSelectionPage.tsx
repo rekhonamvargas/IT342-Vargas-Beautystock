@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useAuthStore } from '../store/auth'
+import { useAuthStore } from '@/store/auth'
 
 export default function RoleSelectionPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [selectedRole, setSelectedRole] = useState<'YOUTH' | 'ADULT'>('ADULT')
+  const [selectedRole, setSelectedRole] = useState('ADULT')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const setUser = useAuthStore((state) => state.setUser)
+  const setUser = useAuthStore((state: any) => state.setUser)
 
   const handleConfirmRole = async () => {
     setLoading(true)

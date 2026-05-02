@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useAuthStore } from '../store/auth'
+import { useAuthStore } from '@/store/auth'
 
 export default function OAuth2CallbackPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [error, setError] = useState<string | null>(null)
-  const setUser = useAuthStore((state) => state.setUser)
-  const setToken = useAuthStore((state) => state.setToken)
+  const setUser = useAuthStore((state: any) => state.setUser)
+  const setToken = useAuthStore((state: any) => state.setToken)
 
   useEffect(() => {
     const token = searchParams.get('token')
