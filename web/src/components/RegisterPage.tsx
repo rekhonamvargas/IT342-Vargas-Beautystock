@@ -28,25 +28,6 @@ export function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleGoogleSuccess = async (idToken: string) => {
-    setError(null)
-    try {
-      setIsLoading(true)
-      const response = await authApi.googleAuth(idToken, formData.ageRange)
-      localStorage.setItem('token', response.data.token)
-      setUser(response.data.user)
-      navigate('/dashboard')
-    } catch (err: any) {
-      const msg =
-        typeof err.response?.data === 'string'
-          ? err.response.data
-          : err.response?.data?.message || 'Google sign-up failed'
-      setError(msg)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -92,8 +73,6 @@ export function RegisterPage() {
 
         {/* Google */}
         <GoogleSignInButton
-          onSuccess={handleGoogleSuccess}
-          onError={(err) => setError(err)}
           text="signup_with"
         />
 

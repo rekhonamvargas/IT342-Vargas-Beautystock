@@ -10,9 +10,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://ep-jolly-mud-a1s7m4ju-pooler.ap-southeast-1.aws.neon.tech/IT342-Vargas-Beautystock?sslmode=require
-    username: neondb_owner
-    password: npg_3d1TStbRYlwo
+    url: jdbc:postgresql://ep-jolly-mud-a1s7m4ju-pooler.ap-southeast-1.aws.neon.tech/IT342-Vargas-Beautystock?user=neondb_owner&password=npg_3d1TStbRYlwo&sslmode=require&channelBinding=require
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
@@ -45,8 +43,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:placeholder-client-id}
-            client-secret: ${GOOGLE_CLIENT_SECRET:placeholder-client-secret}
+            client-id: 385645622527-ua4rm4umb58oesk09tuamqq5kbdijuqu.apps.googleusercontent.com
+            client-secret: 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I
             scope:
               - openid
               - profile
@@ -62,8 +60,8 @@ spring:
 
 app:
   oauth2:
-    redirect-success-url: ${OAUTH2_REDIRECT_SUCCESS_URL:http://localhost:3004/oauth2/callback}
-    redirect-failure-url: ${OAUTH2_REDIRECT_FAILURE_URL:http://localhost:3004/login}
+    redirect-success-url: ${OAUTH2_REDIRECT_SUCCESS_URL:http://localhost:3000/oauth2/callback}
+    redirect-failure-url: ${OAUTH2_REDIRECT_FAILURE_URL:http://localhost:3000/login}
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-at-least-32-characters-long-change-this-in-production-12345}
