@@ -25,36 +25,31 @@ public class EmailService {
      */
     public void sendWelcomeEmail(String toEmail, String fullName) {
         try {
+            if (fromEmail == null || fromEmail.isEmpty() || fromEmail.equals("${spring.mail.username}")) {
+                log.warn("Email sender not configured, skipping email send to {}", toEmail);
+                return;
+            }
+
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(toEmail);
             message.setSubject("Welcome to BeautyStock!");
-            message.setText(buildWelcomeEmailBody(fullName));
+            message.setText(buildWelcomeEmailBody());
             
             mailSender.send(message);
             log.info("Welcome email sent to {}", toEmail);
         } catch (Exception e) {
-            log.error("Failed to send welcome email to {}: {}", toEmail, e.getMessage());
+            log.error("Failed to send welcome email to {}: {}", toEmail, e.getMessage(), e);
+            // Don't throw exception - allow registration to proceed even if email fails
         }
     }
 
-    private String buildWelcomeEmailBody(String fullName) {
-        return String.format(
-            "Hello %s,\n\n" +
-            "Welcome to BeautyStock! 🌸\n\n" +
-            "We're excited to have you join our community. BeautyStock is your personal beauty collection tracker " +
-            "where you can manage and organize your skincare and cosmetics.\n\n" +
-            "Get Started:\n" +
-            "• Add your first product\n" +
-            "• Organize by category\n" +
-            "• Track expiration dates\n" +
-            "• Get personalized skincare advice\n" +
-            "• Mark your favorites\n\n" +
-            "If you have any questions or need assistance, feel free to reach out to us.\n\n" +
-            "Happy organizing!\n\n" +
-            "Best regards,\n" +
-            "The BeautyStock Team",
-            fullName
-        );
+    private String buildWelcomeEmailBody() {
+        return "Dearest Esteemed User,\n\n" +
+               "It is with great pleasure that I welcome you to *BeautyStock*—a most clever companion for keeping one's beauty treasures in perfect order.\n\n" +
+               "From tracking your cherished cosmetics to offering timely skincare advice—tailored by age and even the whims of the weather—you shall find yourself wonderfully well attended.\n\n" +
+               "Pray, enjoy the elegance of organization and care.\n\n" +
+               "Yours sincerely,\n" +
+               "BeautyStock";
     }
 }
