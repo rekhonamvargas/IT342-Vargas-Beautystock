@@ -9,5 +9,6 @@
   ],
   "maven.projects.includes": [
     "backend/pom.xml"
-  ]
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
 }
