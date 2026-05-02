@@ -49,7 +49,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             User user = userRepository.findByEmail(email).orElse(null);
             boolean isNewUser = false;
             if (user == null) {
-                // Create new user
+                // Create new user - don't set role yet, let user choose
                 isNewUser = true;
                 user = new User();
                 user.setEmail(email);
@@ -60,18 +60,21 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 user.setGoogleId(googleId);
                 user.setPassword(""); // Placeholder for OAuth2 users
                 user.setEmailVerified(true);
-                user.setRole(UserRole.ROLE_ADULT); // Default role
+                user.setRole(UserRole.ROLE_ADULT); // Temporary default - will be changed by user
                 userRepository.save(user);
                 
                 // Send welcome email for new users
                 emailService.sendWelcomeEmail(email, user.getFullName());
+            } else {
+                // Send login notification email for returning users
+                emailService.sendLoginNotificationEmail(email, user.getFullName());
             }
 
             // Generate JWT token (same structure as email/password login)
             String token = jwtTokenProvider.generateToken(user);
 
-            // Redirect to frontend with token
-            String redirectUrl = redirectSuccessUrl + "?token=" + token;
+            // Redirect to frontend with token and flag for new users to select role
+            String redirectUrl = redirectSuccessUrl + "?token=" + token + "&isNewUser=" + isNewUser;
             response.sendRedirect(redirectUrl);
         } catch (Exception e) {
             throw new ServletException("OAuth2 authentication failed", e);

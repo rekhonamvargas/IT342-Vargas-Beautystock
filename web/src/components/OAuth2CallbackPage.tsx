@@ -12,6 +12,7 @@ export default function OAuth2CallbackPage() {
   useEffect(() => {
     const token = searchParams.get('token')
     const errorParam = searchParams.get('error')
+    const isNewUser = searchParams.get('isNewUser') === 'true'
 
     if (errorParam) {
       setError(decodeURIComponent(errorParam))
@@ -24,8 +25,13 @@ export default function OAuth2CallbackPage() {
       localStorage.setItem('authToken', token)
       setToken(token)
 
-      // Fetch user info from backend
-      fetchUserInfo(token)
+      // If new user from Google OAuth, redirect to role selection
+      if (isNewUser) {
+        navigate(`/role-selection?token=${token}`, { replace: true })
+      } else {
+        // For existing users, go directly to dashboard
+        fetchUserInfo(token)
+      }
     } else {
       setError('No token received from OAuth2 provider')
       navigate('/login', { replace: true })

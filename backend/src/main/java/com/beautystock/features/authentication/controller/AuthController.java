@@ -5,6 +5,7 @@ import com.beautystock.features.authentication.dto.LoginDTO;
 import com.beautystock.features.authentication.dto.RegisterDTO;
 import com.beautystock.features.authentication.dto.UserProfileDTO;
 import com.beautystock.features.authentication.entity.User;
+import com.beautystock.features.authentication.entity.UserRole;
 import com.beautystock.features.authentication.repository.UserRepository;
 import com.beautystock.features.authentication.service.AuthService;
 import jakarta.validation.Valid;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -64,6 +67,38 @@ public class AuthController {
                     profile.setProfileImageUrl(user.getProfileImageUrl());
                     profile.setCreatedAt(user.getCreatedAt());
                     return ResponseEntity.ok((Object) profile);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found"));
+    }
+
+    /** PATCH /api/v1/auth/me/role - Update user role */
+    @PatchMapping("/me/role")
+    public ResponseEntity<?> updateUserRole(@RequestBody Map<String, String> roleUpdate) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        String roleStr = roleUpdate.get("role");
+
+        if (roleStr == null) {
+            return ResponseEntity.badRequest().body("Role is required");
+        }
+
+        return userRepository.findByEmail(email)
+                .map(user -> {
+                    try {
+                        user.setRole(UserRole.valueOf(roleStr));
+                        userRepository.save(user);
+                        
+                        UserProfileDTO profile = new UserProfileDTO();
+                        profile.setId(user.getId());
+                        profile.setEmail(user.getEmail());
+                        profile.setFullName(user.getFullName());
+                        profile.setRole(user.getRole().name());
+                        profile.setProfileImageUrl(user.getProfileImageUrl());
+                        profile.setCreatedAt(user.getCreatedAt());
+                        return ResponseEntity.ok((Object) profile);
+                    } catch (IllegalArgumentException e) {
+                        return ResponseEntity.badRequest().body("Invalid role: " + roleStr);
+                    }
                 })
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found"));
     }
