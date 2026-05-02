@@ -1,4 +1,4 @@
-package com.beautystock.shared.config;
+package com.beautystock.infrastructure.config;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.beautystock.shared.service.EmailService;
+import com.beautystock.infrastructure.service.EmailService;
 
 import java.security.Key;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.beautystock.shared.config;
+package com.beautystock.infrastructure.config;
 
 import java.util.Arrays;
 
