@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Risque&display=swap');
+
 @font-face {
   font-family: 'Mathilda';
   src: url('/fonts/MathildaDEMO.otf') format('opentype');
@@ -137,6 +139,57 @@
   }
 }
 
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+/* === FULL SCREEN SPARKLE BACKGROUND === */
+.sparkle-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* === INDIVIDUAL SPARKLES === */
+.sparkle-global {
+  position: absolute;
+  font-size: 12px;
+  color: #ec4899;
+  opacity: 0.9;
+  animation: sparkleFloat 7s infinite ease-in-out;
+  pointer-events: none;
+
+  /* glow effect */
+  filter: drop-shadow(0 0 8px #ec4899) drop-shadow(0 0 16px #ec4899);
+}
+
+/* === FLOATING ANIMATION === */
+@keyframes sparkleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.6);
+  }
+}
+
 @keyframes helloWave {
   0%,
   100% {
@@ -151,4 +204,98 @@
   75% {
     transform: translateY(-2px) rotate(3deg);
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Risque&display=swap');
+
+/* === MYSTERY NUMBER STYLE === */
+/* BASE (no color here) */
+.mystic-number {
+  font-family:  "Risque", serif;
+  font-size: 22px;
+  letter-spacing: 0.05em;
+   font-weight: 700;
+}
+
+/* === COLORS PER STAT === */
+
+/* 🧴 Total Products (gold) */
+.mystic-gold {
+  background: linear-gradient(90deg, #facc15, #fde68a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.6));
+}
+
+/* ❤️ Favorites (pink/red) */
+.mystic-pink {
+  background: linear-gradient(90deg, #fb7185, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 6px rgba(244, 114, 182, 0.6));
+}
+
+/* ⚠️ Expiring (orange) */
+.mystic-orange {
+  background: linear-gradient(90deg, #fb923c, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.6));
+}
+
+/* ↘ Running Out (rose/red) */
+.mystic-rose {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.6));
+}
+.risque-regular {
+  font-family: "Risque", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+/* === FLOATING MAGIC PARTICLES === */
+@keyframes mysticFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.6);
+  }
+}
+
+.mystic {
+  position: absolute;
+  font-size: 8px;
+  color: #c084fc;
+  animation: mysticFloat 3s infinite ease-in-out;
+  pointer-events: none;
+}
+
+/* === ENHANCED STAT CARD === */
+.stat-card {
+  @apply bg-white rounded-xl border border-cream-200 p-4 relative;
+  background: linear-gradient(135deg, #ffffff, #f8f5ff);
 }

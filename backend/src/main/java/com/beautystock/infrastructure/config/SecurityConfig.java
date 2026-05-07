@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/v1/auth/register").permitAll()
                         .requestMatchers("/v1/auth/login").permitAll()
+                        .requestMatchers("/v1/auth/google").permitAll()
                         .requestMatchers("/login/oauth2/**").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/error").permitAll()

@@ -4,9 +4,6 @@ const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 })
 
 // Add token to requests if available
@@ -14,6 +11,10 @@ apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken') || localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  }
+  // Set JSON header for non-FormData requests
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json'
   }
   return config
 })
@@ -52,7 +53,17 @@ export const authApi = {
 }
 
 export const userApi = {
+  getProfile: () => apiClient.get('/users/me'),
+  updateProfile: (data: any) => apiClient.put('/users/me/profile', data),
   updateLocation: (city: string) => apiClient.put('/users/me/location', { city }),
+  uploadProfileImage: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post('/users/me/profile-image', formData)
+  },
+  getNotificationSettings: () => apiClient.get('/users/me/notifications'),
+  updateNotificationSettings: (data: any) => apiClient.put('/users/me/notifications', data),
+  testNotification: () => apiClient.post('/users/me/test-notification'),
 }
 
 export const productApi = {
@@ -64,9 +75,7 @@ export const productApi = {
   uploadImage: (id: number, file: File) => {
     const formData = new FormData()
     formData.append('file', file)
-    return apiClient.post(`/products/${id}/upload-image`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    return apiClient.post(`/products/${id}/upload-image`, formData)
   },
   getExpiring: () => apiClient.get('/products/expiring'),
   getDashboard: () => apiClient.get('/products/dashboard'),

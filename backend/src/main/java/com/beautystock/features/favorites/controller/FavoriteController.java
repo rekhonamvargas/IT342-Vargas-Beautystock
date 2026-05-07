@@ -2,12 +2,14 @@ package com.beautystock.features.favorites.controller;
 
 import com.beautystock.features.products.service.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/favorites")
+@PreAuthorize("isAuthenticated()")
 public class FavoriteController {
 
     private final ProductService productService;

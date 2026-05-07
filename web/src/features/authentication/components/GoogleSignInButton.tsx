@@ -1,6 +1,6 @@
 const handleGoogleSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
   e.preventDefault()
-  window.location.href = '/api/oauth2/authorization/google'
+  window.location.href = 'http://localhost:8080/api/oauth2/authorization/google'
 }
 
 interface GoogleSignInButtonProps {

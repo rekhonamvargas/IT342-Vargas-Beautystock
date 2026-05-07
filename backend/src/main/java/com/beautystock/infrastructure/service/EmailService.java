@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
+
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
     private final JavaMailSender mailSender;
@@ -20,69 +21,132 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    /**
-     * Send a welcome email to a newly registered user
-     */
+    // =========================
+    // ✅ WELCOME EMAIL
+    // =========================
     public void sendWelcomeEmail(String toEmail, String fullName) {
         try {
-            if (fromEmail == null || fromEmail.isEmpty() || fromEmail.equals("${spring.mail.username}")) {
-                log.warn("Email sender not configured, skipping email send to {}", toEmail);
-                return;
-            }
+            if (isEmailNotConfigured()) return;
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(toEmail);
-            message.setSubject("Welcome to BeautyStock!");
-            message.setText(buildWelcomeEmailBody());
-            
+            message.setSubject("✨ Welcome to BeautyStock");
+            message.setText(buildWelcomeEmailBody(fullName));
+
             mailSender.send(message);
             log.info("Welcome email sent to {}", toEmail);
+
         } catch (Exception e) {
-            log.error("Failed to send welcome email to {}: {}", toEmail, e.getMessage(), e);
-            // Don't throw exception - allow registration to proceed even if email fails
+            log.error("Failed to send welcome email: {}", e.getMessage());
         }
     }
 
-    /**
-     * Send a login notification email to an existing user
-     */
+    // =========================
+    // ✅ LOGIN EMAIL
+    // =========================
     public void sendLoginNotificationEmail(String toEmail, String fullName) {
         try {
-            if (fromEmail == null || fromEmail.isEmpty() || fromEmail.equals("${spring.mail.username}")) {
-                log.warn("Email sender not configured, skipping email send to {}", toEmail);
-                return;
-            }
+            if (isEmailNotConfigured()) return;
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(toEmail);
-            message.setSubject("Welcome back to BeautyStock!");
-            message.setText(buildLoginNotificationEmailBody());
-            
+            message.setSubject("✨ Welcome back to BeautyStock");
+            message.setText(buildLoginBody(fullName));
+
             mailSender.send(message);
-            log.info("Login notification email sent to {}", toEmail);
+            log.info("Login email sent to {}", toEmail);
+
         } catch (Exception e) {
-            log.error("Failed to send login notification email to {}: {}", toEmail, e.getMessage(), e);
-            // Don't throw exception - allow login to proceed even if email fails
+            log.error("Failed to send login email: {}", e.getMessage());
         }
     }
 
-    private String buildLoginNotificationEmailBody() {
-        return "Dearest Esteemed User,\n\n" +
-               "It is with great pleasure that I welcome you to *BeautyStock*—a most clever companion for keeping one's beauty treasures in perfect order.\n\n" +
-               "From tracking your cherished cosmetics to offering timely skincare advice—tailored by age and even the whims of the weather—you shall find yourself wonderfully well attended.\n\n" +
-               "Pray, enjoy the elegance of organization and care.\n\n" +
-               "Yours sincerely,\n" +
-               "BeautyStock";
+    // =========================
+    // ✅ EXPIRATION EMAIL
+    // =========================
+    public void sendExpirationReminder(String toEmail, String productName, String expirationDate, int days) {
+        try {
+            if (isEmailNotConfigured()) return;
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+
+            message.setSubject("⏰ " + productName + " expires in " + days + " day(s)");
+
+            message.setText(buildExpirationBody(productName, expirationDate, days));
+
+            mailSender.send(message);
+
+            log.info("Expiration email sent to {} for {}", toEmail, productName);
+
+        } catch (Exception e) {
+            log.error("Failed to send expiration email: {}", e.getMessage());
+        }
     }
 
-    private String buildWelcomeEmailBody() {
-        return "Dearest Esteemed User,\n\n" +
-               "It is with great pleasure that I welcome you to *BeautyStock*—a most clever companion for keeping one's beauty treasures in perfect order.\n\n" +
-               "From tracking your cherished cosmetics to offering timely skincare advice—tailored by age and even the whims of the weather—you shall find yourself wonderfully well attended.\n\n" +
-               "Pray, enjoy the elegance of organization and care.\n\n" +
+    // =========================
+    // ✅ CUSTOM EMAIL (FIXES YOUR ERROR)
+    // =========================
+    public void sendCustomEmail(String toEmail, String subject, String body) {
+        try {
+            if (isEmailNotConfigured()) return;
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject(subject);
+            message.setText(body);
+
+            mailSender.send(message);
+
+            log.info("Custom email sent to {}", toEmail);
+
+        } catch (Exception e) {
+            log.error("Failed to send custom email: {}", e.getMessage());
+        }
+    }
+
+    // =========================
+    // ✨ MESSAGE BUILDERS
+    // =========================
+
+    private String buildWelcomeEmailBody(String name) {
+        return "Dearest " + name + ",\n\n" +
+               "Welcome to BeautyStock ✨\n\n" +
+               "Your beauty collection now has a refined and elegant home.\n\n" +
                "Yours sincerely,\n" +
-               "BeautyStock";
+               "— BeautyStock Society";
+    }
+
+    private String buildLoginBody(String name) {
+        return "Welcome back, " + name + " ✨\n\n" +
+               "Your collection awaits your graceful touch.\n\n" +
+               "— BeautyStock";
+    }
+
+    private String buildExpirationBody(String productName, String date, int days) {
+        return String.format(
+            "My Dearest Beauty Enthusiast,\n\n" +
+            "Your treasured item '%s' shall expire in %d day(s).\n" +
+            "Final date: %s.\n\n" +
+            "Pray, attend to it with haste lest it lose its charm.\n\n" +
+            "With elegance and care,\n" +
+            "— BeautyStock Society ✨",
+            productName, days, date
+        );
+    }
+
+    // =========================
+    // ⚠️ CONFIG CHECK
+    // =========================
+    private boolean isEmailNotConfigured() {
+        if (fromEmail == null || fromEmail.isEmpty() || fromEmail.contains("${")) {
+            log.warn("Email not configured. Skipping send.");
+            return true;
+        }
+        return false;
     }
 }

@@ -7,6 +7,10 @@ interface User {
   lastName: string
   role: string
   city: string | null
+  profileImageUrl: string | null
+  googleId: string | null
+  notificationEmail: string | null
+  notificationsEnabled: boolean
 }
 
 interface AuthStore {
@@ -39,6 +43,7 @@ interface WeatherData {
   city: string
   temperature: number
   humidity: number
+  condition: string | null
   advice: string
 }
 

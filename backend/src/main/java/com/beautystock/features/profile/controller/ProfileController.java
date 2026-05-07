@@ -4,12 +4,14 @@ import com.beautystock.features.authentication.dto.UserProfileDTO;
 import com.beautystock.features.authentication.repository.UserRepository;
 import com.beautystock.features.profile.dto.ProfileUpdateDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/profile")
+@PreAuthorize("isAuthenticated()")
 public class ProfileController {
 
     private final UserRepository userRepository;

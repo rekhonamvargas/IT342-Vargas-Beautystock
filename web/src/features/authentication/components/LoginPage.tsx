@@ -33,16 +33,23 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream px-4 py-8">
-      <div className="w-full max-w-[420px] rounded-2xl border border-cream-200 bg-white px-5 py-6 shadow-[0_4px_24px_rgba(26,16,8,.06)]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50/30 via-cream to-rose-50/20 px-4 py-8 relative overflow-hidden">
+      {/* Decorative glowing orbs */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-pink-300/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-40 h-40 bg-rose-300/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-yellow-200/10 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      
+      <div className="w-full max-w-[420px] rounded-3xl border-2 border-pink-200 bg-gradient-to-br from-white/90 to-pink-50/50 backdrop-blur-sm px-8 py-8 shadow-[0_0_40px_rgba(236,72,153,0.15)] hover:shadow-[0_0_60px_rgba(236,72,153,0.25)] transition-shadow duration-300 relative overflow-hidden">
+        {/* Glowing accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pink-400 to-transparent opacity-60"></div>
         {/* Logo */}
-        <div className="text-center mb-5">
+        <div className="text-center mb-6">
           <div className="flex items-center justify-center gap-1.5 mb-2">
             <span className="text-pink text-xs">✦</span>
-            <span className="font-serif font-bold text-[#C88A1A] text-sm">BeautyStock</span>
+            <span className="hello-title text-sm text-[#C88A1A]">BeautyStock</span>
           </div>
-          <h2 className="font-serif text-[44px] leading-none font-bold text-dark">Welcome back</h2>
-          <p className="text-muted text-[12px] mt-2">Your inventory is ready for you.</p>
+          <h2 className="font-serif text-[44px] leading-none italic text-dark">Welcome back</h2>
+          <p className="text-muted text-xs mt-2 font-medium">Your inventory is ready for you.</p>
         </div>
 
         {/* Google */}
@@ -50,56 +57,66 @@ export function LoginPage() {
           text="signin_with"
         />
 
-        {error && (
-          <div className="mt-3 p-2.5 bg-red-50 border border-red-100 rounded-lg text-red text-xs">
-            {error}
-          </div>
-        )}
-
         {/* Form */}
-        <form onSubmit={handleSubmit} className="mt-1 space-y-3">
-          <div className="fg">
-            <label className="text-[11px] font-semibold text-dark">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="rekhona@example.com"
-              disabled={isLoading}
-              required
-              className="h-11 rounded-xl text-[13px]"
-            />
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border-2 border-red-200 rounded-xl text-red text-sm flex items-center gap-2 animate-fade-in">
+              <span>⚠️</span> {error}
+            </div>
+          )}
+          
+          <div className="space-y-4">
+            <div className="fg">
+              <label className="text-sm font-semibold text-dark">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="yourname@example.com"
+                disabled={isLoading}
+                required
+                className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink bg-white transition-all placeholder:text-muted/60"
+              />
+            </div>
+            <div className="fg">
+              <label className="text-sm font-semibold text-dark">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                disabled={isLoading}
+                required
+                className="w-full px-4 py-2.5 border-2 border-pink-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink bg-white transition-all placeholder:text-muted/60"
+              />
+            </div>
           </div>
-          <div className="fg">
-            <label className="text-[11px] font-semibold text-dark">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="••••••••"
-              disabled={isLoading}
-              required
-              className="h-11 rounded-xl text-[13px]"
-            />
-          </div>
-          <div className="text-right pt-0.5">
-            <button type="button" className="text-[11px] text-pink font-semibold hover:underline">
+          
+          <div className="text-right">
+            <button type="button" className="text-sm text-pink hover:text-pink-700 font-semibold hover:underline transition-colors">
               Forgot password?
             </button>
           </div>
-          <button type="submit" disabled={isLoading} className="btn-pink w-full h-11 rounded-xl text-sm">
-            {isLoading ? 'Signing in...' : 'Sign In'}
+          
+          <button 
+            type="submit" 
+            disabled={isLoading} 
+            className="btn-pink w-full h-11 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            {isLoading ? '⏳ Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-muted text-[12px] mt-4">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-pink font-semibold hover:underline">
-            Create one
-          </Link>
-        </p>
+        <div className="mt-5 pt-5 border-t border-pink-100">
+          <p className="text-center text-muted text-sm">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-pink font-semibold hover:underline">
+              Create one
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

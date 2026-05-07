@@ -5,9 +5,11 @@ import { useAuthStore } from '@/store/auth'
 export default function RoleSelectionPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [selectedRole, setSelectedRole] = useState('ADULT')
+
+  const [selectedRole, setSelectedRole] = useState<'YOUTH' | 'ADULT'>('ADULT')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
   const setUser = useAuthStore((state: any) => state.setUser)
 
   const handleConfirmRole = async () => {
@@ -16,30 +18,36 @@ export default function RoleSelectionPage() {
 
     try {
       const token = searchParams.get('token')
+
       if (!token) {
         setError('No authentication token found')
+        setLoading(false)
         return
       }
 
-      // Update user role
       const response = await fetch('/api/v1/auth/me/role', {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ role: selectedRole === 'YOUTH' ? 'ROLE_YOUTH' : 'ROLE_ADULT' }),
+        body: JSON.stringify({
+          role: selectedRole === 'YOUTH' ? 'ROLE_YOUTH' : 'ROLE_ADULT',
+        }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData || 'Failed to update role')
+        throw new Error(data?.message || 'Failed to update role')
       }
 
-      // Get updated user info
-      const userData = await response.json()
-      setUser(userData)
+      // Save user
+      setUser(data)
+
+      // Redirect
       navigate('/dashboard', { replace: true })
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to set role')
     } finally {
@@ -48,89 +56,65 @@ export default function RoleSelectionPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-rose-50 to-cream">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-rose-100">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="text-4xl mb-3">✦</div>
-            <h1 className="text-3xl font-serif text-dark mb-2">BeautyStock</h1>
-            <p className="text-rose-600 font-medium">Select Your Age Group</p>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50/30 via-cream to-rose-50/20 px-4 py-6 relative overflow-hidden">
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
-            </div>
-          )}
+      {/* Background Effects */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-pink-300/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-40 h-40 bg-rose-300/20 rounded-full blur-3xl animate-pulse"></div>
 
-          {/* Role Selection */}
-          <div className="space-y-3 mb-8">
-            {/* Youth Button */}
-            <button
-              onClick={() => setSelectedRole('YOUTH')}
-              className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
-                selectedRole === 'YOUTH'
-                  ? 'border-rose-400 bg-rose-50 shadow-lg'
-                  : 'border-gray-200 bg-white hover:border-rose-200'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`text-2xl ${selectedRole === 'YOUTH' ? 'scale-110' : ''}`}>
-                  🌱
-                </div>
-                <div>
-                  <div className="font-semibold text-dark">Youth</div>
-                  <div className="text-sm text-gray-600">Age 13–24</div>
-                </div>
-                {selectedRole === 'YOUTH' && (
-                  <div className="ml-auto text-rose-400">✓</div>
-                )}
-              </div>
-            </button>
+      <div className="w-full max-w-md rounded-3xl border-2 border-pink-200 bg-white px-6 py-6 shadow-lg">
 
-            {/* Adult Button */}
-            <button
-              onClick={() => setSelectedRole('ADULT')}
-              className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
-                selectedRole === 'ADULT'
-                  ? 'border-rose-400 bg-rose-50 shadow-lg'
-                  : 'border-gray-200 bg-white hover:border-rose-200'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`text-2xl ${selectedRole === 'ADULT' ? 'scale-110' : ''}`}>
-                  🌸
-                </div>
-                <div>
-                  <div className="font-semibold text-dark">Adult</div>
-                  <div className="text-sm text-gray-600">Age 25–44</div>
-                </div>
-                {selectedRole === 'ADULT' && (
-                  <div className="ml-auto text-rose-400">✓</div>
-                )}
-              </div>
-            </button>
-          </div>
-
-          {/* Confirm Button */}
-          <button
-            onClick={handleConfirmRole}
-            disabled={loading}
-            className={`w-full py-3 rounded-xl font-semibold transition-all ${
-              loading
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:shadow-lg hover:scale-105'
-            }`}
-          >
-            {loading ? 'Setting up...' : 'Continue to Dashboard'}
-          </button>
-
-          {/* Info Message */}
-          <p className="text-center text-sm text-gray-600 mt-6">
-            We'll personalize your skincare advice based on your age group
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-dark">Select Your Age Group</h1>
+          <p className="text-muted text-sm mt-1">
+            We'll personalize your experience
           </p>
         </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* OPTIONS */}
+        <div className="space-y-3 mb-6">
+
+          <button
+            onClick={() => setSelectedRole('YOUTH')}
+            className={`w-full p-4 rounded-xl border text-left ${
+              selectedRole === 'YOUTH'
+                ? 'border-pink bg-pink-50'
+                : 'border-gray-200'
+            }`}
+          >
+            🌱 <strong>Youth</strong>
+          </button>
+
+          <button
+            onClick={() => setSelectedRole('ADULT')}
+            className={`w-full p-4 rounded-xl border text-left ${
+              selectedRole === 'ADULT'
+                ? 'border-pink bg-pink-50'
+                : 'border-gray-200'
+            }`}
+          >
+            🌸 <strong>Adult</strong>
+          </button>
+
+        </div>
+
+        {/* BUTTON */}
+        <button
+          onClick={handleConfirmRole}
+          disabled={loading}
+          className="w-full bg-pink text-white py-2 rounded-lg font-semibold"
+        >
+          {loading ? 'Setting up...' : 'Continue'}
+        </button>
+
       </div>
     </div>
   )
