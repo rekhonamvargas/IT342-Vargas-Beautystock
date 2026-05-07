@@ -15,6 +15,7 @@ interface Product {
   isExpired: boolean
   isFavorite: boolean
   isExpiringWithin15Days: boolean
+  status?: string | null
 }
 
 export function Dashboard() {
@@ -36,9 +37,40 @@ export function Dashboard() {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
       .join(' ')
 
+  const removeNumbers = (str: string) => str.replace(/\d+/g, '')
+
+  const getAvailability = (status?: string | null) => {
+    const normalized = (status || '').toLowerCase()
+    if (normalized.includes('out of stock')) return 'Out of stock'
+    if (normalized.includes('running')) return 'Running low'
+    return 'In stock'
+  }
+
+  const getAvailabilityBadge = (status?: string | null) => {
+    const availability = getAvailability(status)
+    if (availability === 'Running low') {
+      return 'px-1.5 py-0.5 rounded-full font-semibold border'
+    }
+    if (availability === 'Out of stock') {
+      return 'px-1.5 py-0.5 rounded-full font-semibold border'
+    }
+    return 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200'
+  }
+
+  const getAvailabilityStyle = (status?: string | null) => {
+    const availability = getAvailability(status)
+    if (availability === 'Running low') {
+      return { backgroundColor: '#f97316', color: 'white', borderColor: '#ea580c' }
+    }
+    if (availability === 'Out of stock') {
+      return { backgroundColor: '#ef4444', color: 'white', borderColor: '#dc2626' }
+    }
+    return {}
+  }
+
   const registeredName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
   const fallbackName = user?.email?.split('@')[0] || 'User'
-  const displayName = toTitleCase(registeredName || fallbackName)
+  const displayName = toTitleCase(removeNumbers(registeredName || fallbackName))
 
   useEffect(() => {
     loadData()
@@ -161,7 +193,7 @@ export function Dashboard() {
           <h1
             className="hello-title text-pink"
           >
-            <span className="hello-wave-wrap">{renderWavingText(`Hello, ${displayName} ✨`)}</span>
+             <span className="hello-wave-wrap">{renderWavingText(`Hello, ${displayName}`)}</span>
           </h1>
         </div>
         <Link to="/products/new" className="btn-pink px-5 py-2 rounded-full text-[11px] mt-1">
@@ -169,82 +201,74 @@ export function Dashboard() {
         </Link>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div className="stat-card py-4 border-[#E5CF83]">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-md bg-pink-50 flex items-center justify-center text-[11px]">🧴</div>
-            <div>
-              <div className="text-2xl font-bold text-dark leading-none">{stats?.totalProducts ?? 0}</div>
-              <div className="text-xs text-muted mt-1">Total Products</div>
-            </div>
-          </div>
+   {/* Stats Grid */}
+<div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+
+  {/* Total Products */}
+  <div className="stat-card py-4 border-[#E5CF83]">
+    <div className="flex items-center gap-3">
+      <div className="w-7 h-7 rounded-md bg-pink-50 flex items-center justify-center text-[11px]">🧴</div>
+      
+      <div>
+        <div className="mystic-number mystic-gold risque-regular">
+          {stats?.totalProducts ?? 0}
         </div>
-        <div className="stat-card py-4 border-[#E5CF83]">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-md bg-[#F7EDFF] flex items-center justify-center text-[11px]">❤️</div>
-            <div>
-              <div className="text-2xl font-bold text-dark leading-none">{stats?.favoritesCount ?? 0}</div>
-              <div className="text-xs text-muted mt-1">Favorites</div>
-            </div>
-          </div>
-        </div>
-        <div className="stat-card py-4 border-[#E5CF83]">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-md bg-orange-50 flex items-center justify-center text-[11px]">⚠️</div>
-            <div>
-              <div className="text-2xl font-bold text-orange leading-none">{stats?.expiringCount ?? 0}</div>
-              <div className="text-xs text-muted mt-1">Expiring Soon</div>
-            </div>
-          </div>
-        </div>
-        <div className="stat-card py-4 border-[#E5CF83]">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-md bg-[#FFE8EA] flex items-center justify-center text-[11px]">↘</div>
-            <div>
-              <div className="text-2xl font-bold text-[#D94A6D] leading-none">{stats?.runningOutCount ?? 0}</div>
-              <div className="text-xs text-muted mt-1">Running Out</div>
-            </div>
-          </div>
-        </div>
+        <p className="text-muted text-xs uppercase tracking-wider font-serif">
+          Total Products
+        </p>
       </div>
+    </div>
+  </div>
 
-      {/* Weather Card */}
-      <div className="rounded-2xl border border-[#E5CF83] bg-white p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-semibold text-sm text-dark flex items-center gap-2">
-              ☁️ {user?.role === 'ROLE_YOUTH' ? 'Youth' : 'Adult'} Skincare Advice
-            </h3>
-
-            {weatherLoading ? (
-              <p className="text-muted text-xs mt-2">Loading weather advice...</p>
-            ) : weather ? (
-              <p className="text-muted text-xs mt-1 flex items-center gap-4">
-                <span>🌡 {weather.temperature}°C</span>
-                <span>💧 {weather.humidity}%</span>
-                <span>{weather.city}</span>
-              </p>
-            ) : (
-              <p className="text-muted text-xs mt-1">No weather data yet.</p>
-            )}
-          </div>
-
-          <button
-            onClick={loadWeatherAdvice}
-            className="text-[11px] font-semibold text-pink hover:underline"
-            type="button"
-          >
-            Refresh
-          </button>
+  {/* Favorites */}
+  <div className="stat-card py-4 border-[#E5CF83]">
+    <div className="flex items-center gap-3">
+      <div className="w-7 h-7 rounded-md bg-[#F7EDFF] flex items-center justify-center text-[11px]">❤️</div>
+      
+      <div>
+        <div className="mystic-number mystic-pink risque-regular">
+          {stats?.favoritesCount ?? 0}
         </div>
-
-        <div className="mt-3 rounded-md border border-pink-200 bg-pink-50 px-3 py-2">
-          <p className="text-[11px] text-pink-700 leading-relaxed">
-            {weather?.advice || weatherError || 'Set your city in Profile to load weather-based skincare advice.'}
-          </p>
-        </div>
+        <p className="text-muted text-xs uppercase tracking-wider font-serif">
+          Favorites
+        </p>
       </div>
+    </div>
+  </div>
+
+  {/* Expiring Soon */}
+  <div className="stat-card py-4 border-[#E5CF83]">
+    <div className="flex items-center gap-3">
+      <div className="w-7 h-7 rounded-md bg-orange-50 flex items-center justify-center text-[11px]">⚠️</div>
+      
+      <div>
+        <div className="mystic-number mystic-orange risque-regular">
+          {stats?.expiringCount ?? 0}
+        </div>
+        <p className="text-muted text-xs uppercase tracking-wider font-serif">
+          Expiring Soon
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* Running Out */}
+  <div className="stat-card py-4 border-[#E5CF83]">
+    <div className="flex items-center gap-3">
+      <div className="w-7 h-7 rounded-md bg-[#FFE8EA] flex items-center justify-center text-[11px]">↘</div>
+      
+      <div>
+        <div className="mystic-number mystic-rose risque-regular">
+          {stats?.runningOutCount ?? 0}
+        </div>
+        <p className="text-muted text-xs uppercase tracking-wider font-serif">
+          Running Out
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
 
       {/* Recent Products */}
       <div>
@@ -258,9 +282,9 @@ export function Dashboard() {
         {recentProducts.length === 0 ? (
           <div className="rounded-2xl border border-[#E5CF83] bg-white text-center py-14 px-6 min-h-[320px] flex flex-col items-center justify-center">
             <div className="text-4xl mb-4">📦</div>
-            <h3 className="text-4xl leading-tight font-bold text-dark mb-2">No products yet</h3>
-            <p className="text-muted text-xl leading-tight mb-7">Start by adding your first beauty product</p>
-            <Link to="/products/new" className="btn-pink px-8 py-3 rounded-xl text-base">+ Add Product</Link>
+           <p className="text-muted text-xxs uppercase tracking-wider mb-1 font-normal font-serif">No products yet</p>
+            <p className="text-muted text-xs" style={{ fontFamily: 'Arial, sans-serif' }}>Start by adding your first beauty product</p>
+            <Link to="/products/new" className="btn-pink px-8 py-3 rounded-xl text-base mt-4">+ Add Product</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -282,7 +306,7 @@ export function Dashboard() {
                     }}
                     title={product.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                   >
-                    {product.isFavorite ? '❤️' : '♡'}
+                     {product.isFavorite ? '❤️' : '🤍'}
                   </button>
                   <Link to={`/products/${product.id}`} className="block w-full h-full flex items-center justify-center">
                     <ProductImage
@@ -298,15 +322,20 @@ export function Dashboard() {
                   <Link to={`/products/${product.id}`} className="block">
                     <p className="text-[10px] text-pink font-semibold uppercase tracking-wide">{product.brand}</p>
                     <p className="text-sm font-semibold text-dark mt-1 line-clamp-1">{product.name}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm font-bold text-dark">{formatPrice(product.price)}</span>
-                      {product.isExpiringWithin15Days && !product.isExpired && (
-                        <span className="text-[10px] bg-orange-50 text-orange px-2 py-0.5 rounded-full font-semibold">Expiring</span>
-                      )}
-                      {product.isExpired && (
-                        <span className="text-[10px] bg-red-50 text-red px-2 py-0.5 rounded-full font-semibold">Expired</span>
-                      )}
-                    </div>
+                     <div className="flex items-center justify-between mt-2">
+                       <span className="text-sm font-bold text-dark">{formatPrice(product.price)}</span>
+                       <div className="flex items-center gap-1">
+                         {product.isExpiringWithin15Days && !product.isExpired && (
+                           <span className="text-[10px] bg-orange-50 text-orange px-1.5 py-0.5 rounded-full font-semibold">Expiring</span>
+                         )}
+                         {product.isExpired && (
+                           <span className="text-[10px] bg-red-50 text-red px-1.5 py-0.5 rounded-full font-semibold">Expired</span>
+                         )}
+                         <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-semibold border ${getAvailabilityBadge(product.status)}`} style={getAvailabilityStyle(product.status)}>
+                           {getAvailability(product.status)}
+                         </span>
+                       </div>
+                     </div>
                   </Link>
                 </div>
               </div>

@@ -1,6 +1,55 @@
 import { useState } from 'react'
 import { productApi } from '@/services/api'
 
+// Compress and enhance image quality using canvas
+const enhanceImage = (file: File, maxWidth = 1200, quality = 0.92): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let width = img.width
+        let height = img.height
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+
+        canvas.width = width
+        canvas.height = height
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'))
+          return
+        }
+
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = 'high'
+        ctx.drawImage(img, 0, 0, width, height)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }))
+            } else {
+              reject(new Error('Failed to create blob'))
+            }
+          },
+          'image/jpeg',
+          quality
+        )
+      }
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = e.target?.result as string
+    }
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsDataURL(file)
+  })
+}
+
 interface AddProductFormProps {
   onSuccess: () => void
   onCancel: () => void
@@ -26,9 +75,16 @@ export function AddProductForm({ onSuccess, onCancel }: AddProductFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0])
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      try {
+        const enhancedFile = await enhanceImage(file)
+        setFile(enhancedFile)
+      } catch (err) {
+        console.error('Image enhancement failed:', err)
+        setFile(file)
+      }
     }
   }
 
@@ -67,58 +123,62 @@ export function AddProductForm({ onSuccess, onCancel }: AddProductFormProps) {
   }
 
   return (
-    <div className="card max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Product</h2>
+    <div className="card max-w-2xl mx-auto font-sans text-[13px]">
+      <h2 className="text-lg font-bold text-gray-800 mb-4 tracking-wide">
+        Add New Product
+      </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+          <div className="p-2 bg-red-50 border border-red-200 rounded text-red-600 text-xs">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+             <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Product Name *</p>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="e.g., Moisturizing Cream"
-              className="input-field"
+              placeholder="Moisturizing Cream"
+              className="input-field text-xs py-1.5"
               disabled={isLoading}
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Brand *</label>
+            <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Brand *</p>
             <input
               type="text"
               name="brand"
               value={formData.brand}
               onChange={handleInputChange}
-              placeholder="e.g., Glossier"
-              className="input-field"
+              placeholder="Glossier"
+              className="input-field text-xs py-1.5"
               disabled={isLoading}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+             <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Category</p>
             <input
               type="text"
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              placeholder="e.g., Skincare"
-              className="input-field"
+              placeholder="Skincare"
+              className="input-field text-xs py-1.5"
               disabled={isLoading}
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₱) *</label>
+             <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Price (₱) *</p>
             <input
               type="number"
               name="price"
@@ -126,87 +186,89 @@ export function AddProductForm({ onSuccess, onCancel }: AddProductFormProps) {
               onChange={handleInputChange}
               placeholder="0.00"
               step="0.01"
-              className="input-field"
+              className="input-field text-xs py-1.5"
               disabled={isLoading}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+           <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Description</p>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleInputChange}
             placeholder="Product description..."
-            rows={3}
-            className="input-field"
+            rows={2}
+            className="input-field text-xs py-1.5"
             disabled={isLoading}
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Location</label>
+             <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Purchase Location</p>
             <input
               type="text"
               name="purchaseLocation"
               value={formData.purchaseLocation}
               onChange={handleInputChange}
-              placeholder="e.g., Sephora"
-              className="input-field"
+              placeholder="Sephora"
+              className="input-field text-xs py-1.5"
               disabled={isLoading}
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+             <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Expiration Date</p>
             <input
               type="date"
               name="expirationDate"
               value={formData.expirationDate}
               onChange={handleInputChange}
-              className="input-field"
+              className="input-field text-xs py-1.5"
               disabled={isLoading}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Opened Date</label>
+           <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Opened Date</p>
           <input
             type="date"
             name="openedDate"
             value={formData.openedDate}
             onChange={handleInputChange}
-            className="input-field"
+            className="input-field text-xs py-1.5"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+           <p className="text-muted text-xs uppercase tracking-wider mb-1 font-normal font-serif">Product Image</p>
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-rose-50 file:text-rose-600 hover:file:bg-rose-100"
+            className="block w-full text-xs text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100"
             disabled={isLoading}
           />
         </div>
 
-        <div className="flex gap-4 pt-4">
+        <div className="flex gap-3 pt-3">
           <button
             type="submit"
             disabled={isLoading}
-            className="btn-primary flex-1"
+            className="flex-1 bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold py-2 rounded-lg transition"
           >
             {isLoading ? 'Creating...' : 'Add Product'}
           </button>
+
           <button
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="btn-secondary flex-1"
+            className="flex-1 border border-gray-300 text-gray-600 text-xs py-2 rounded-lg hover:bg-gray-50 transition"
           >
             Cancel
           </button>

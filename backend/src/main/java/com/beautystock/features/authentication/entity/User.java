@@ -13,20 +13,26 @@ public class User {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 500)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash", nullable = false, length = 500)
     private String passwordHash;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "full_name", nullable = false, length = 500)
     private String fullName;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(name = "profile_image_url")
+    @Column(name = "profile_image_url", columnDefinition = "TEXT")
     private String profileImageUrl;
 
     @Column(name = "google_id")
@@ -46,6 +52,12 @@ public class User {
 
     @Column
     private String city;
+
+    @Column(name = "notification_email", length = 500)
+    private String notificationEmail;
+
+    @Column(name = "notifications_enabled", nullable = false)
+    private boolean notificationsEnabled = false;
 
     public User() {}
 
@@ -76,6 +88,23 @@ public class User {
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
 
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { 
+        this.firstName = firstName;
+        updateFullName();
+    }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { 
+        this.lastName = lastName;
+        updateFullName();
+    }
+
+    private void updateFullName() {
+        this.fullName = ((firstName != null ? firstName : "") + " " + 
+                        (lastName != null ? lastName : "")).trim();
+    }
+
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }
 
@@ -99,4 +128,10 @@ public class User {
 
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
+
+    public String getNotificationEmail() { return notificationEmail; }
+    public void setNotificationEmail(String notificationEmail) { this.notificationEmail = notificationEmail; }
+
+    public boolean isNotificationsEnabled() { return notificationsEnabled; }
+    public void setNotificationsEnabled(boolean notificationsEnabled) { this.notificationsEnabled = notificationsEnabled; }
 }
