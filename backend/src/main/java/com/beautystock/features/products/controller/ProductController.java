@@ -4,6 +4,7 @@ import com.beautystock.features.products.dto.CreateProductDTO;
 import com.beautystock.features.products.dto.ProductDTO;
 import com.beautystock.features.products.service.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/products")
+@PreAuthorize("isAuthenticated()")
 public class ProductController {
 
     private final ProductService productService;

@@ -53,6 +53,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 isNewUser = true;
                 user = new User();
                 user.setEmail(email);
+                user.setFirstName(givenName);
+                user.setLastName(familyName);
                 String fullName = ((givenName != null ? givenName : "") + " " + 
                                   (familyName != null ? familyName : "")).trim();
                 user.setFullName(fullName.isEmpty() ? email : fullName);
@@ -61,11 +63,24 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 user.setPassword(""); // Placeholder for OAuth2 users
                 user.setEmailVerified(true);
                 user.setRole(UserRole.ROLE_ADULT); // Temporary default - will be changed by user
+                // Automatically set notification email to user's Google email and enable notifications
+                user.setNotificationEmail(email);
+                user.setNotificationsEnabled(true);
                 userRepository.save(user);
                 
                 // Send welcome email for new users
                 emailService.sendWelcomeEmail(email, user.getFullName());
             } else {
+                // For existing users, update googleId and ensure notificationEmail is set
+                if (user.getGoogleId() == null || user.getGoogleId().isEmpty()) {
+                    user.setGoogleId(googleId);
+                    // If this is their first Google connection, set notification email
+                    if (user.getNotificationEmail() == null || user.getNotificationEmail().isEmpty()) {
+                        user.setNotificationEmail(email);
+                        user.setNotificationsEnabled(true);
+                    }
+                    userRepository.save(user);
+                }
                 // Send login notification email for returning users
                 emailService.sendLoginNotificationEmail(email, user.getFullName());
             }
