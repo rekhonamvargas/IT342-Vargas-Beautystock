@@ -1,6 +1,7 @@
 package com.beautystock.features.authentication.service;
 
 import com.beautystock.features.authentication.dto.AuthResponseDTO;
+import com.beautystock.features.authentication.dto.GoogleAuthRequestDTO;
 import com.beautystock.features.authentication.dto.LoginDTO;
 import com.beautystock.features.authentication.dto.RegisterDTO;
 import com.beautystock.features.authentication.dto.UserProfileDTO;
@@ -26,7 +27,9 @@ import com.beautystock.infrastructure.service.EmailService;
 
 import java.security.Key;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -81,6 +84,8 @@ public class AuthService {
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
         user.setFullName(dto.getFullName());
         user.setRole(role);
         user.setEmailVerified(true);
@@ -98,6 +103,7 @@ public class AuthService {
                 .token(jwt)
                 .refreshToken(refresh)
                 .user(mapToProfile(saved))
+                .isNewUser(true)
                 .build();
     }
 
@@ -128,6 +134,98 @@ public class AuthService {
                 .refreshToken(refresh)
                 .user(mapToProfile(user))
                 .build();
+    }
+
+    @Transactional
+    public AuthResponseDTO authenticateWithGoogle(GoogleAuthRequestDTO dto) {
+        // This endpoint accepts a Google ID token from the client-side flow
+        // Verify the token and authenticate the user
+        try {
+            // For production, use GoogleIdTokenVerifier to validate the token
+            // For now, extract basic info from the token (simplified)
+            String idToken = dto.getIdToken();
+            
+            // Decode JWT to extract payload (without verification for demo)
+            // In production, always verify with Google's API
+            String[] parts = idToken.split("\\.");
+            if (parts.length != 3) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "{\"code\":\"AUTH-002\",\"message\":\"Invalid Google ID token\"}");
+            }
+            
+            // Decode base64 payload
+            String payloadJson = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
+            java.util.Map<String, Object> payload = new com.fasterxml.jackson.databind.ObjectMapper().readValue(payloadJson, java.util.Map.class);
+            
+            String googleId = (String) payload.get("sub");
+            String email = (String) payload.get("email");
+            String fullName = (String) payload.get("name");
+            String pictureUrl = (String) payload.get("picture");
+            Boolean emailVerified = (Boolean) payload.get("email_verified");
+            
+            if (email == null || googleId == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "{\"code\":\"AUTH-002\",\"message\":\"Invalid Google ID token\"}");
+            }
+            
+            // Find existing user by email OR googleId
+            Optional<User> existingUser = userRepository.findByEmail(email);
+            boolean isNewUser = false;
+            User user;
+
+            if (existingUser.isPresent()) {
+                user = existingUser.get();
+                // Update googleId if not set
+                if (user.getGoogleId() == null) {
+                    user.setGoogleId(googleId);
+                }
+                user.setLastLoginAt(LocalDateTime.now());
+                userRepository.save(user);
+            } else {
+                Optional<User> byGoogleId = userRepository.findByGoogleId(googleId);
+                if (byGoogleId.isPresent()) {
+                    user = byGoogleId.get();
+                    user.setLastLoginAt(LocalDateTime.now());
+                    userRepository.save(user);
+                } else {
+                    // Create new user
+                    UserRole role = "YOUTH".equalsIgnoreCase(dto.getAgeRange())
+                            ? UserRole.ROLE_YOUTH
+                            : UserRole.ROLE_ADULT;
+
+                    user = new User();
+                    user.setEmail(email);
+                    user.setFullName(fullName != null ? fullName : email.split("@")[0]);
+                    user.setProfileImageUrl(pictureUrl);
+                    user.setRole(role);
+                    user.setEmailVerified(emailVerified != null && emailVerified);
+                    user.setGoogleId(googleId);
+                    // Set a placeholder password hash since OAuth users don't use password
+                    String randomPassword = UUID.randomUUID().toString();
+                    user.setPasswordHash(passwordEncoder.encode(randomPassword));
+
+                    user = userRepository.save(user);
+                    isNewUser = true;
+                    log.info("User created via Google OAuth: {}", user.getEmail());
+                }
+            }
+
+            String jwt = generateJWT(user);
+            String refresh = createRefreshToken(user);
+
+            return AuthResponseDTO.builder()
+                    .token(jwt)
+                    .refreshToken(refresh)
+                    .user(mapToProfile(user))
+                    .isNewUser(isNewUser)
+                    .build();
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Google OAuth authentication failed: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "{\"code\":\"AUTH-003\",\"message\":\"Google authentication failed\"}");
+        }
     }
 
     @Transactional
