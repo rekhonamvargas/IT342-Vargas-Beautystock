@@ -10,9 +10,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/beautystock}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: jdbc:postgresql://ep-jolly-mud-a1s7m4ju-pooler.ap-southeast-1.aws.neon.tech/IT342-Vargas-Beautystock?user=neondb_owner&password=npg_3d1TStbRYlwo&sslmode=require&channelBinding=require
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
@@ -32,7 +30,7 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
+    username: ${MAIL_USERNAME:rekhonavargas04@gmail.com}
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
@@ -49,8 +47,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: XXXXXXXXXXXXXXXXXXXXXXX
+            client-secret: YYYYYYYYYYYYYYYYYYY
             scope:
               - openid
               - profile
@@ -66,10 +64,10 @@ spring:
 
 app:
   oauth2:
-    redirect-success-url: ${OAUTH2_REDIRECT_SUCCESS_URL:http://localhost:3000/oauth2/callback}
-    redirect-failure-url: ${OAUTH2_REDIRECT_FAILURE_URL:http://localhost:3000/login}
+    redirect-success-url: http://localhost:3000/oauth2/callback
+    redirect-failure-url: http://localhost:3000/login
   weather:
-    api-key: ${WEATHER_API_KEY:}
+    api-key: c942c03efbaba84c7b4b1619856761ac
     api-url: https://api.openweathermap.org/data/2.5
 
 jwt:
