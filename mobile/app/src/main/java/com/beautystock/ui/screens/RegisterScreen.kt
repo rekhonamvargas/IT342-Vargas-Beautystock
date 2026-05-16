@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.beautystock.data.api.RetrofitClient
 import com.beautystock.data.model.RegisterRequest
+import com.beautystock.ui.auth.launchGoogleOAuth
 import kotlinx.coroutines.launch
 import android.util.Patterns
 import android.widget.Toast
@@ -229,6 +230,20 @@ fun RegisterScreen(onNavigateToLogin: () -> Unit) {
                         )
                     }
                 }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = { context.launchGoogleOAuth() },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(50)
+            ) {
+                Text(
+                    "Continue with Google",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = colorScheme.onSurface
+                )
             }
 
             Spacer(Modifier.height(20.dp))

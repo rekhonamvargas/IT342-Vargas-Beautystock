@@ -12,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.beautystock.data.api.RetrofitClient
 import com.beautystock.data.model.LoginRequest
+import com.beautystock.ui.auth.launchGoogleOAuth
 import com.beautystock.ui.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
@@ -28,6 +30,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavigateToRegister: () -> Unit) 
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val colorScheme = MaterialTheme.colorScheme
+    val context = LocalContext.current
 
     Scaffold(containerColor = colorScheme.background) { padding ->
         Column(
@@ -157,7 +160,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavigateToRegister: () -> Unit) 
             Spacer(Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = { /* Google sign-in placeholder */ },
+                onClick = { context.launchGoogleOAuth() },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(50)
             ) {

@@ -14,6 +14,7 @@ import com.beautystock.R
 import com.beautystock.data.api.RetrofitClient
 import com.beautystock.data.local.TokenManager
 import com.beautystock.data.model.LoginRequest
+import com.beautystock.ui.auth.launchGoogleOAuth
 import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
@@ -41,7 +42,7 @@ class LoginActivity : ComponentActivity() {
         }
 
         googleLoginButton.setOnClickListener {
-            Toast.makeText(this, "Google sign-in is not configured yet", Toast.LENGTH_SHORT).show()
+            launchGoogleOAuth()
         }
 
         loginButton.setOnClickListener {

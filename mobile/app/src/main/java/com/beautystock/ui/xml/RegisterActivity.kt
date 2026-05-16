@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.beautystock.R
 import com.beautystock.data.api.RetrofitClient
 import com.beautystock.data.model.RegisterRequest
+import com.beautystock.ui.auth.launchGoogleOAuth
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -65,7 +66,7 @@ class RegisterActivity : ComponentActivity() {
             }
 
             googleButton.setOnClickListener {
-                Toast.makeText(this, "Google sign-up is not configured yet", Toast.LENGTH_SHORT).show()
+                launchGoogleOAuth()
             }
 
             registerButton.setOnClickListener {

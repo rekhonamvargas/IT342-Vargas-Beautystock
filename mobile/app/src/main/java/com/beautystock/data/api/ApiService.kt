@@ -14,11 +14,17 @@ interface ApiService {
     @POST("v1/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
 
+    @POST("v1/auth/google")
+    suspend fun googleAuth(@Body request: GoogleAuthRequest): Response<AuthResponse>
+
     @POST("v1/auth/logout")
     suspend fun logout(): Response<Unit>
 
     @GET("v1/auth/me")
     suspend fun getMe(): Response<UserDTO>
+
+    @PATCH("v1/auth/me/role")
+    suspend fun updateRole(@Body request: RoleUpdateRequest): Response<UserDTO>
 
     // Products
     @GET("products")

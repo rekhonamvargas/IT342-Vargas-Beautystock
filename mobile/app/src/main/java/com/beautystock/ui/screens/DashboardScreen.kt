@@ -175,7 +175,7 @@ fun DashboardScreen(
                         role = if (user?.role == "ROLE_YOUTH") "Youth" else "Adult",
                         tempC = w.temperature?.toInt() ?: 0,
                         humidity = w.humidity ?: 0,
-                        condition = w.city ?: "",
+                        condition = w.condition ?: w.city ?: "",
                         adviceText = w.advice ?: ""
                     )
                 }

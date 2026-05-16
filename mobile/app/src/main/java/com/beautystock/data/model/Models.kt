@@ -2,6 +2,11 @@ package com.beautystock.data.model
 
 data class LoginRequest(val email: String, val password: String)
 
+data class GoogleAuthRequest(
+    val idToken: String,
+    val ageRange: String? = null
+)
+
 data class RegisterRequest(
     val fullName: String,
     val email: String,
@@ -22,7 +27,10 @@ data class UserDTO(
     val role: String,
     val profileImageUrl: String? = null,
     val createdAt: String? = null,
-    val city: String? = null
+    val city: String? = null,
+    val googleId: String? = null,
+    val notificationEmail: String? = null,
+    val notificationsEnabled: Boolean? = null
 )
 
 data class ProductDTO(
@@ -61,10 +69,15 @@ data class DashboardDTO(
 )
 
 data class WeatherResponse(
-    val city: String?,
-    val temperature: Double?,
-    val humidity: Int?,
-    val advice: String?
+    val city: String? = null,
+    val temperature: Double? = null,
+    val humidity: Int? = null,
+    val condition: String? = null,
+    val advice: String? = null
+)
+
+data class RoleUpdateRequest(
+    val role: String
 )
 
 data class LocationRequest(val city: String)

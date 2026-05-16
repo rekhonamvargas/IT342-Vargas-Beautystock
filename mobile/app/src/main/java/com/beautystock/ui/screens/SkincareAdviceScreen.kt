@@ -92,7 +92,7 @@ fun SkincareAdviceScreen(authViewModel: AuthViewModel, onBack: () -> Unit) {
                             role = role,
                             tempC = w.temperature?.toInt() ?: 0,
                             humidity = w.humidity ?: 0,
-                            condition = w.city ?: "",
+                            condition = w.condition ?: w.city ?: "",
                             adviceText = w.advice ?: "Set your location in Profile to get personalized advice."
                         )
                     }

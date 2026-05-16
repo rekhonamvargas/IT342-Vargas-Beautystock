@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen_gradient">
+
+    <View
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="-70dp"
+        android:layout_marginEnd="-60dp"
+        android:background="@drawable/bg_orb_primary" />
+
+    <View
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginBottom="-60dp"
+        android:layout_marginStart="-40dp"
+        android:background="@drawable/bg_orb_secondary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_panel_luxe"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/lora"
+                    android:text="Select Your Age Group"
+                    android:textColor="@color/bs_dark"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="We’ll personalize your experience"
+                    android:textColor="@color/bs_muted"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnYouthRole"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_surface"
+                        android:fontFamily="@font/poppins"
+                        android:gravity="center"
+                        android:lineSpacingExtra="3dp"
+                        android:text="🌱 Youth&#10;Age 13 - 24"
+                        android:textAllCaps="false"
+                        android:textColor="@color/bs_muted_dark"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnAdultRole"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_surface"
+                        android:fontFamily="@font/poppins"
+                        android:gravity="center"
+                        android:lineSpacingExtra="3dp"
+                        android:text="🌸 Adult&#10;Age 25 - 44"
+                        android:textAllCaps="false"
+                        android:textColor="@color/bs_muted_dark"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRoleError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/bs_red_error"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnContinueRole"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:fontFamily="@font/poppins"
+                    android:text="Continue"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

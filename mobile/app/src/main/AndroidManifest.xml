@@ -30,6 +30,24 @@
 
         <activity android:name=".ui.xml.LoginActivity" android:exported="false" />
         <activity android:name=".ui.xml.RegisterActivity" android:exported="false" />
+        <activity
+            android:name=".ui.xml.OAuth2CallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="localhost"
+                    android:port="3000"
+                    android:path="/oauth2/callback" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.xml.RoleSelectionActivity" android:exported="false" />
         <activity android:name=".ui.xml.DashboardActivity" android:exported="false" />
     </application>
 
