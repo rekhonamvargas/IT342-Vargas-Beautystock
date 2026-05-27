@@ -9,17 +9,23 @@ import com.beautystock.features.authentication.entity.User;
 import com.beautystock.features.authentication.entity.UserRole;
 import com.beautystock.features.authentication.repository.UserRepository;
 import com.beautystock.features.authentication.service.AuthService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/auth")
+@Validated
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -30,96 +36,99 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /** POST /api/v1/auth/register */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterDTO dto) {
-        AuthResponseDTO response = authService.register(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterDTO request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 
-    /** POST /api/v1/auth/login */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginDTO dto) {
-        AuthResponseDTO response = authService.login(dto);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
-    /** POST /api/v1/auth/google — Google OAuth2 ID token authentication */
     @PostMapping("/google")
-    public ResponseEntity<AuthResponseDTO> googleAuth(@Valid @RequestBody GoogleAuthRequestDTO dto) {
-        AuthResponseDTO response = authService.authenticateWithGoogle(dto);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AuthResponseDTO> google(@RequestBody GoogleAuthRequestDTO request) {
+        return ResponseEntity.ok(authService.authenticateWithGoogle(request));
     }
 
-    /** POST /api/v1/auth/logout — revokes all refresh tokens */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        authService.logout(email);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> logout(Authentication authentication) {
+        if (authentication != null && authentication.getName() != null) {
+            authService.logout(authentication.getName());
+        }
         return ResponseEntity.noContent().build();
     }
 
-    /** GET /api/v1/auth/me */
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
-        return userRepository.findByEmail(email)
-                .map(user -> {
-                    UserProfileDTO profile = new UserProfileDTO();
-                    profile.setId(user.getId());
-                    profile.setEmail(user.getEmail());
-                    profile.setFirstName(user.getFirstName());
-                    profile.setLastName(user.getLastName());
-                    profile.setFullName(user.getFullName());
-                    profile.setRole(user.getRole().name());
-                    profile.setProfileImageUrl(user.getProfileImageUrl());
-                    profile.setGoogleId(user.getGoogleId());
-                    profile.setNotificationEmail(user.getNotificationEmail());
-                    profile.setNotificationsEnabled(user.isNotificationsEnabled());
-                    profile.setCreatedAt(user.getCreatedAt());
-                    profile.setCity(user.getCity());
-                    return ResponseEntity.ok((Object) profile);
-                })
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found"));
-    }
-
-    /** PATCH /api/v1/auth/me/role - Update user role */
-    @PatchMapping("/me/role")
-    public ResponseEntity<?> updateUserRole(@RequestBody Map<String, String> roleUpdate) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        String roleStr = roleUpdate.get("role");
-
-        if (roleStr == null) {
-            return ResponseEntity.badRequest().body("Role is required");
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserProfileDTO> me(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(401).build();
         }
 
-        return userRepository.findByEmail(email)
-                .map(user -> {
-                    try {
-                        user.setRole(UserRole.valueOf(roleStr));
-                        userRepository.save(user);
-                        
-                        UserProfileDTO profile = new UserProfileDTO();
-                        profile.setId(user.getId());
-                        profile.setEmail(user.getEmail());
-                        profile.setFirstName(user.getFirstName());
-                        profile.setLastName(user.getLastName());
-                        profile.setFullName(user.getFullName());
-                        profile.setRole(user.getRole().name());
-                        profile.setProfileImageUrl(user.getProfileImageUrl());
-                        profile.setGoogleId(user.getGoogleId());
-                        profile.setNotificationEmail(user.getNotificationEmail());
-                        profile.setNotificationsEnabled(user.isNotificationsEnabled());
-                        profile.setCreatedAt(user.getCreatedAt());
-                        profile.setCity(user.getCity());
-                        return ResponseEntity.ok((Object) profile);
-                    } catch (IllegalArgumentException e) {
-                        return ResponseEntity.badRequest().body("Invalid role: " + roleStr);
-                    }
-                })
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found"));
+        String email = authentication.getName();
+        Optional<User> u = userRepository.findByEmailIgnoreCase(email);
+        if (u.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = u.get();
+        UserProfileDTO dto = UserProfileDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .fullName(user.getFullName())
+                .role(user.getRole() != null ? user.getRole().name() : null)
+                .profileImageUrl(user.getProfileImageUrl())
+                .googleId(user.getGoogleId())
+                .createdAt(user.getCreatedAt())
+                .city(user.getCity())
+                .build();
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping("/me/role")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserProfileDTO> updateRole(Authentication authentication, @RequestBody Map<String, String> request) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String roleValue = request.get("role");
+        if (roleValue == null || roleValue.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        UserRole role;
+        try {
+            role = UserRole.valueOf(roleValue);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<User> u = userRepository.findByEmailIgnoreCase(authentication.getName());
+        if (u.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = u.get();
+        user.setRole(role);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(UserProfileDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .fullName(user.getFullName())
+                .role(user.getRole() != null ? user.getRole().name() : null)
+                .profileImageUrl(user.getProfileImageUrl())
+                .googleId(user.getGoogleId())
+                .createdAt(user.getCreatedAt())
+                .city(user.getCity())
+                .build());
     }
 }

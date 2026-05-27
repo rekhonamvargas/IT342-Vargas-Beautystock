@@ -130,7 +130,7 @@ export function AddProductPage() {
         const shouldRetryWithoutStatus = createErr?.response?.status === 400 || createErr?.response?.status === 422
         if (!shouldRetryWithoutStatus) throw createErr
 
-        const { status, ...payloadWithoutStatus } = basePayload as any
+        const { status: _status, ...payloadWithoutStatus } = basePayload as any
         res = await productApi.create(payloadWithoutStatus)
       }
 

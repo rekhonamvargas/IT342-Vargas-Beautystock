@@ -1,10 +1,8 @@
 package com.beautystock.features.authentication.dto;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
-
 public class UserProfileDTO {
-    private UUID id;
+    private Long id;
     private String email;
     private String firstName;
     private String lastName;
@@ -19,8 +17,8 @@ public class UserProfileDTO {
 
     public UserProfileDTO() {}
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -58,7 +56,7 @@ public class UserProfileDTO {
     public static Builder builder() { return new Builder(); }
 
     public static class Builder {
-        private UUID id;
+        private Long id;
         private String email;
         private String firstName;
         private String lastName;
@@ -71,7 +69,7 @@ public class UserProfileDTO {
         private LocalDateTime createdAt;
         private String city;
 
-        public Builder id(UUID id) { this.id = id; return this; }
+        public Builder id(Long id) { this.id = id; return this; }
         public Builder email(String email) { this.email = email; return this; }
         public Builder firstName(String firstName) { this.firstName = firstName; return this; }
         public Builder lastName(String lastName) { this.lastName = lastName; return this; }

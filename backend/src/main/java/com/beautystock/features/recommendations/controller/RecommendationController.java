@@ -4,9 +4,7 @@ import com.beautystock.features.recommendations.dto.WeatherResponse;
 import com.beautystock.features.recommendations.service.RecommendationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/recommendations")
@@ -27,6 +25,14 @@ public class RecommendationController {
     @GetMapping("/adult/weather")
     public ResponseEntity<WeatherResponse> getAdultWeather() {
         WeatherResponse response = recommendationService.getWeatherAdvice("ROLE_ADULT");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/weather")
+    public ResponseEntity<WeatherResponse> getWeatherByCity(
+            @RequestParam(required = false) String city,
+            @RequestParam(defaultValue = "ROLE_USER") String role) {
+        WeatherResponse response = recommendationService.getWeatherAdviceForCity(role, city);
         return ResponseEntity.ok(response);
     }
 }

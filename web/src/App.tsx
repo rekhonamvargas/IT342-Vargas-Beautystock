@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
 import { authApi } from '@/services/api'
 import { Layout } from '@/features/shared/components/Layout'
@@ -38,9 +38,85 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const setToken = useAuthStore((state) => state.setToken)
+  const isLoading = useAuthStore((state) => state.isLoading)
   const token = localStorage.getItem('authToken') || localStorage.getItem('token')
+
+  const searchParams = new URLSearchParams(location.search)
+  const queryToken = searchParams.get('token')
+
+  if (!token && queryToken) {
+    return (
+      <OAuthBootstrapGate
+        queryToken={queryToken}
+        locationPathname={location.pathname}
+        locationSearch={location.search}
+        navigate={navigate}
+        setToken={setToken}
+      />
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-pink border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-muted text-sm">Loading your account...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!token) return <Navigate to="/login" replace />
   return <>{children}</>
+}
+
+function OAuthBootstrapGate({
+  queryToken,
+  locationPathname,
+  locationSearch,
+  navigate,
+  setToken,
+}: {
+  queryToken: string
+  locationPathname: string
+  locationSearch: string
+  navigate: ReturnType<typeof useNavigate>
+  setToken: (token: string) => void
+}) {
+  const [isBootstrapping, setIsBootstrapping] = useState(true)
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(locationSearch)
+    const isNewUser = searchParams.get('isNewUser') === 'true'
+
+    localStorage.setItem('authToken', queryToken)
+    setToken(queryToken)
+
+    if (isNewUser) {
+      navigate(`/role-selection?token=${encodeURIComponent(queryToken)}`, { replace: true })
+      return
+    }
+
+    navigate({ pathname: locationPathname, search: '' }, { replace: true })
+    setIsBootstrapping(false)
+  }, [locationPathname, locationSearch, navigate, queryToken, setToken])
+
+  if (isBootstrapping) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="text-center">
+          <h1 className="text-2xl font-serif text-dark mb-4">Completing Sign In...</h1>
+          <p className="text-dark/70">Processing your Google authentication</p>
+        </div>
+      </div>
+    )
+  }
+
+  return null
 }
 
 function PublicOnly({ children }: { children: React.ReactNode }) {

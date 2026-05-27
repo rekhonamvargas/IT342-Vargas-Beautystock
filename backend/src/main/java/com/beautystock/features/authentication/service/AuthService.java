@@ -71,8 +71,10 @@ public class AuthService {
                     "{\"code\":\"VALID-001\",\"message\":\"Passwords do not match\"}");
         }
 
+        String normalizedEmail = normalizeEmail(dto.getEmail());
+
         // DB-002: duplicate email
-        if (userRepository.existsByEmail(dto.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "{\"code\":\"DB-002\",\"message\":\"Email already registered\"}");
         }
@@ -82,7 +84,7 @@ public class AuthService {
                 : UserRole.ROLE_ADULT;
 
         User user = new User();
-        user.setEmail(dto.getEmail());
+        user.setEmail(normalizedEmail);
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
@@ -111,14 +113,16 @@ public class AuthService {
     public AuthResponseDTO login(LoginDTO dto) {
         // AUTH-001: invalid credentials
         try {
+            String normalizedEmail = normalizeEmail(dto.getEmail());
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
+                new UsernamePasswordAuthenticationToken(normalizedEmail, dto.getPassword()));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "{\"code\":\"AUTH-001\",\"message\":\"Invalid email or password\"}");
         }
 
-        User user = userRepository.findByEmail(dto.getEmail())
+        String normalizedEmail = normalizeEmail(dto.getEmail());
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                         "{\"code\":\"AUTH-001\",\"message\":\"Invalid email or password\"}"));
 
@@ -158,7 +162,7 @@ public class AuthService {
             java.util.Map<String, Object> payload = new com.fasterxml.jackson.databind.ObjectMapper().readValue(payloadJson, java.util.Map.class);
             
             String googleId = (String) payload.get("sub");
-            String email = (String) payload.get("email");
+            String email = normalizeEmail((String) payload.get("email"));
             String fullName = (String) payload.get("name");
             String pictureUrl = (String) payload.get("picture");
             Boolean emailVerified = (Boolean) payload.get("email_verified");
@@ -169,7 +173,7 @@ public class AuthService {
             }
             
             // Find existing user by email OR googleId
-            Optional<User> existingUser = userRepository.findByEmail(email);
+            Optional<User> existingUser = userRepository.findByEmailIgnoreCase(email);
             boolean isNewUser = false;
             User user;
 
@@ -230,7 +234,7 @@ public class AuthService {
 
     @Transactional
     public void logout(String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
+        userRepository.findByEmailIgnoreCase(normalizeEmail(email)).ifPresent(user -> {
             refreshTokenRepository.deleteByUser(user);
             log.info("Revoked all refresh tokens for: {}", email);
         });
@@ -266,10 +270,16 @@ public class AuthService {
         return UserProfileDTO.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .fullName(user.getFullName())
                 .role(user.getRole().name())
                 .profileImageUrl(user.getProfileImageUrl())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 }

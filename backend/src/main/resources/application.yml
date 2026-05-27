@@ -3,22 +3,18 @@ spring:
     name: beautystock-api
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/beautystock}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: ${DATABASE_URL:jdbc:postgresql://ep-jolly-mud-a1s7m4ju-pooler.ap-southeast-1.aws.neon.tech/IT342-Vargas-Beautystock?user=neondb_owner&password=npg_3d1TStbRYlwo&sslmode=require&channelBinding=require}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 5
-      data-source-properties:
-        sslmode: require
   flyway:
     locations: classpath:db/migration
     outOfOrder: true
@@ -49,8 +45,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${GOOGLE_CLIENT_ID:385645622527-qmle6fj09e7pr2pesktcmr6umincu3sf.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
             scope:
               - openid
               - profile
@@ -65,13 +61,21 @@ spring:
             user-name-attribute: email
 
 app:
-  oauth2:
-    redirect-success-url: ${OAUTH2_REDIRECT_SUCCESS_URL:http://localhost:3000/oauth2/callback}
-    redirect-failure-url: ${OAUTH2_REDIRECT_FAILURE_URL:http://localhost:3000/login}
-  weather:
-    api-key: ${WEATHER_API_KEY:}
-    api-url: https://api.openweathermap.org/data/2.5
+  cors:
+    allowed-origins: http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001
 
+  oauth2:
+    # Frontend redirects
+    redirect-success-url: http://localhost:3000/oauth2/callback
+    redirect-failure-url: http://localhost:3000/login
+
+    # Mobile redirects
+    mobile-redirect-success-url: exp://5oslcdu-anonymous-8081.exp.direct/oauth2/callback
+    mobile-redirect-failure-url: exp://5oslcdu-anonymous-8081.exp.direct/login
+
+  weather:
+    api-key: ${WEATHER_API_KEY:22fd7253c4449e90cda670adf8b46568}
+    api-url: https://api.openweathermap.org/data/2.5
 jwt:
   secret: ${JWT_SECRET:your-secret-key-at-least-32-characters-long-change-this-in-production-12345}
   expiration: 86400000

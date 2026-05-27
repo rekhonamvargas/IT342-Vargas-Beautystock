@@ -172,7 +172,7 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         if (!favoriteRepository.existsByOwnerEmailAndProduct(ownerEmail, product)) {
-            var user = userRepository.findByEmail(ownerEmail)
+                var user = userRepository.findByEmailIgnoreCase(ownerEmail)
                     .orElseThrow(() -> new RuntimeException("User not found"));
             Favorite favorite = new Favorite();
             favorite.setOwnerEmail(ownerEmail);
@@ -188,6 +188,14 @@ public class ProductService {
         Product product = productRepository.findByIdAndOwnerEmail(productId, ownerEmail)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         favoriteRepository.deleteByOwnerEmailAndProduct(ownerEmail, product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDTO> getFavorites() {
+        String ownerEmail = getCurrentEmail();
+        return favoriteRepository.findByOwnerEmail(ownerEmail).stream()
+                .map(f -> toDto(f.getProduct(), ownerEmail))
+                .toList();
     }
 
     @Transactional(readOnly = true)

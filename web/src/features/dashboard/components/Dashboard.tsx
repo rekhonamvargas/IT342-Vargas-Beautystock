@@ -20,11 +20,10 @@ interface Product {
 
 export function Dashboard() {
   const { user } = useAuthStore()
-  const { weather, error: weatherError, setWeather, setError: setWeatherError } = useWeatherStore()
+  const { setWeather, setError: setWeatherError } = useWeatherStore()
   const { stats, setStats } = useDashboardStore()
   const [recentProducts, setRecentProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [weatherLoading, setWeatherLoading] = useState(false)
   const [togglingFavorite, setTogglingFavorite] = useState<number | null>(null)
 
   const productPastelBackgrounds = ['bg-[#F8E6EB]', 'bg-[#E7F0EB]', 'bg-[#EDE7F8]', 'bg-[#FBEEDC]']
@@ -78,7 +77,6 @@ export function Dashboard() {
 
   const loadWeatherAdvice = async () => {
     try {
-      setWeatherLoading(true)
       setWeatherError(null)
 
       const weatherRes =
@@ -90,8 +88,6 @@ export function Dashboard() {
     } catch {
       setWeather(null)
       setWeatherError('Unable to load weather advice. Set your city in Profile and try again.')
-    } finally {
-      setWeatherLoading(false)
     }
   }
 

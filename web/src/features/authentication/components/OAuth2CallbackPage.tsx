@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
+import { authApi } from '@/services/api'
 
 export default function OAuth2CallbackPage() {
   const navigate = useNavigate()
@@ -29,8 +30,7 @@ export default function OAuth2CallbackPage() {
       if (isNewUser) {
         navigate(`/role-selection?token=${token}`, { replace: true })
       } else {
-        // For existing users, go directly to dashboard
-        fetchUserInfo(token)
+        fetchUserInfo()
       }
     } else {
       setError('No token received from OAuth2 provider')
@@ -38,20 +38,10 @@ export default function OAuth2CallbackPage() {
     }
   }, [searchParams, navigate, setUser, setToken])
 
-  const fetchUserInfo = async (token: string) => {
+  const fetchUserInfo = async () => {
     try {
-      const response = await fetch('/api/v1/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info')
-      }
-
-      const userData = await response.json()
+      const response = await authApi.getMe()
+      const userData = response.data
       setUser(userData)
       navigate('/dashboard', { replace: true })
     } catch (err) {

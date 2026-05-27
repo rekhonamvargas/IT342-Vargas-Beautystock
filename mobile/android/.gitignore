@@ -1,0 +1,46 @@
+# Gradle files
+.gradle/
+build/
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Android Studio
+.idea/
+.DS_Store
+*.iml
+*.iws
+*.ipr
+*.swp
+.classpath
+.project
+.pydevproject
+.settings
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Kotlin
+*.ktx
+kotlin-stdlib*.jar
+
+# Project-specific
+*.log
+
+# Build output
+app/build/
+target/
+dist/
+
+# IDE
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Misc
+.env
+.env.local
+*.jks
+*.keystore
+debug.keystore

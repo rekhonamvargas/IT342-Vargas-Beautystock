@@ -23,7 +23,7 @@ function getBackgroundColorAt(x: number, y: number): string | null {
     const el = document.elementFromPoint(x, y)
     if (!el) return null
     const style = getComputedStyle(el)
-    let bg = style.backgroundColor
+    const bg = style.backgroundColor
     if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
       return bg
     }

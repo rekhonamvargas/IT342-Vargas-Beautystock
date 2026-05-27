@@ -57,16 +57,20 @@ export function WeatherDisplay({ userRole }: WeatherDisplayProps) {
     return null
   }
 
+  const temperatureText = weather.temperature != null ? `${weather.temperature}°C` : 'N/A'
+  const humidityText = weather.humidity != null ? `${weather.humidity}%` : 'N/A'
+  const cityText = weather.city || 'Current location'
+
   return (
     <div className="card max-w-md mx-auto bg-gradient-to-br from-rose-50 to-sage-50">
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div>
           <p className="text-gray-600 text-sm font-medium">Location</p>
-          <p className="text-2xl font-bold text-gray-900">{weather.city}</p>
+          <p className="text-2xl font-bold text-gray-900">{cityText}</p>
         </div>
         <div>
           <p className="text-gray-600 text-sm font-medium">Temperature</p>
-          <p className="text-2xl font-bold text-rose-600">{weather.temperature}°C</p>
+          <p className="text-2xl font-bold text-rose-600">{temperatureText}</p>
         </div>
       </div>
 
@@ -78,7 +82,7 @@ export function WeatherDisplay({ userRole }: WeatherDisplayProps) {
             style={{ width: `${Math.min(weather.humidity, 100)}%` }}
           />
         </div>
-        <p className="text-gray-700 text-sm mt-1">{weather.humidity}%</p>
+        <p className="text-gray-700 text-sm mt-1">{humidityText}</p>
       </div>
 
       <div className="mt-6 pt-6 border-t border-rose-200">

@@ -1,0 +1,63 @@
+<resources>
+    <color name="purple_200">#FFB3B3FF</color>
+    <color name="purple_500">#FF7B68EE</color>
+    <color name="purple_700">#FF6A0DAD</color>
+    <color name="teal_200">#FF80DEEA</color>
+    <color name="teal_700">#FF00897B</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Primary Colors - Pink theme matching web -->
+    <color name="primary">#FFC94B6E</color>
+    <color name="primary_dark">#FFB13B5F</color>
+    <color name="primary_light">#FFF5D1DD</color>
+    <color name="primary_pink">#FFC94B6E</color>
+    <color name="pink_50">#FFFAE8ED</color>
+    <color name="pink_100">#FFF5D1DD</color>
+    <color name="pink_200">#FFEAA3BC</color>
+    <color name="pink_300">#FFDF759B</color>
+    <color name="pink_400">#FFD44779</color>
+    <color name="pink_500">#FFC94B6E</color>
+    <color name="pink_600">#FFB13B5F</color>
+    <color name="pink_700">#FF8F2E4C</color>
+    
+    <!-- Secondary Colors - Gold theme -->
+    <color name="secondary">#FFD4921E</color>
+    <color name="secondary_dark">#FFB07618</color>
+    <color name="secondary_light">#FFFCECC8</color>
+    <color name="accent_gold">#FFD4921E</color>
+    <color name="gold_50">#FFFEF7E8</color>
+    <color name="gold_100">#FFFCECC8</color>
+    <color name="gold_200">#FFF9D994</color>
+    <color name="gold_300">#FFF4C35D</color>
+    <color name="gold_400">#FFE9AB33</color>
+    <color name="gold_500">#FFD4921E</color>
+    <color name="gold_600">#FFB07618</color>
+    <color name="gold_700">#FF8A5B14</color>
+    
+    <!-- Neutral Colors - Cream/Dark theme -->
+    <color name="background">#FFF3EEE9</color>
+    <color name="bg_cream">#FFF3EEE9</color>
+    <color name="bg_white">#FFFFFFFF</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="cream_50">#FFFFF8F0</color>
+    <color name="cream_100">#FFFEF3C7</color>
+    <color name="cream_200">#FFFDE68A</color>
+    <color name="cream_300">#FFFCD34D</color>
+    <color name="text_primary">#FF1A1008</color>
+    <color name="text_secondary">#FF8A7A72</color>
+    <color name="text_hint">#FFBDBDBD</color>
+    <color name="divider">#FFE0E0E0</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#FF4CAF50</color>
+    <color name="warning">#FFFFC107</color>
+    <color name="error">#FFF44336</color>
+    <color name="info">#FF2196F3</color>
+    
+    <!-- Product Status Colors -->
+    <color name="available">#FF4CAF50</color>
+    <color name="expiring_soon">#FFFFC107</color>
+    <color name="running_out">#FFFF9800</color>
+    <color name="expired">#FFF44336</color>
+</resources>

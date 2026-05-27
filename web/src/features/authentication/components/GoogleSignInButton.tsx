@@ -1,6 +1,8 @@
+import { BACKEND_ORIGIN } from '@/services/api'
+
 const handleGoogleSignIn = (e: React.MouseEvent<HTMLButtonElement>) => {
   e.preventDefault()
-  window.location.href = 'http://localhost:8080/api/oauth2/authorization/google'
+  window.location.href = new URL('/api/oauth2/authorization/google', BACKEND_ORIGIN).toString()
 }
 
 interface GoogleSignInButtonProps {

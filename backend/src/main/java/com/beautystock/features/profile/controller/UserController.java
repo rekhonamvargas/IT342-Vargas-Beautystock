@@ -39,7 +39,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     UserProfileDTO profile = new UserProfileDTO();
                     profile.setId(user.getId());
@@ -64,7 +64,7 @@ public class UserController {
     public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     String firstName = request.get("firstName");
                     String lastName = request.get("lastName");
@@ -107,7 +107,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("message", "City is required"));
         }
 
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     user.setCity(city.trim());
                     userRepository.save(user);
@@ -128,7 +128,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("message", "Image file is required"));
         }
 
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     try {
                         // Create uploads directory if it doesn't exist
@@ -177,12 +177,18 @@ public class UserController {
     public ResponseEntity<?> getNotificationSettings() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return userRepository.findByEmail(email)
-                .map(user -> ResponseEntity.ok(Map.of(
-                        "notificationEmail", user.getNotificationEmail(),
-                        "notificationsEnabled", user.isNotificationsEnabled(),
-                        "isGoogleConnected", user.getGoogleId() != null && !user.getGoogleId().isEmpty()
-                )))
+        return userRepository.findByEmailIgnoreCase(email)
+                .map(user -> {
+                    // notificationEmail can be null for email/password users — fall back to login email
+                    String notifEmail = user.getNotificationEmail() != null
+                            ? user.getNotificationEmail()
+                            : user.getEmail();
+                    return ResponseEntity.ok(Map.of(
+                            "notificationEmail", notifEmail,
+                            "notificationsEnabled", user.isNotificationsEnabled(),
+                            "isGoogleConnected", user.getGoogleId() != null && !user.getGoogleId().isEmpty()
+                    ));
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -191,7 +197,7 @@ public class UserController {
     public ResponseEntity<?> updateNotificationSettings(@RequestBody Map<String, Object> request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     // Only update notificationsEnabled flag
                     // Notification email is automatically set from user's Google email
@@ -215,7 +221,7 @@ public class UserController {
     public ResponseEntity<?> testSendNotification() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     if (user.getEmail() == null || user.getEmail().isEmpty()) {
                         return ResponseEntity.badRequest().body(Map.of(

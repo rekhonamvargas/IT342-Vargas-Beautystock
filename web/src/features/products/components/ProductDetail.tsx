@@ -284,7 +284,7 @@ export function ProductDetail() {
         const shouldRetryWithoutStatus = updateErr?.response?.status === 400 || updateErr?.response?.status === 422
         if (!shouldRetryWithoutStatus) throw updateErr
 
-        const { status, ...payloadWithoutStatus } = payload as any
+        const { status: _status, ...payloadWithoutStatus } = payload as any
         await productApi.update(product.id, payloadWithoutStatus)
       }
 
