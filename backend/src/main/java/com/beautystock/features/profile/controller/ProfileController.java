@@ -23,15 +23,18 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<?> getProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
                     UserProfileDTO profile = new UserProfileDTO();
                     profile.setId(user.getId());
                     profile.setEmail(user.getEmail());
+                    profile.setFirstName(user.getFirstName());
+                    profile.setLastName(user.getLastName());
                     profile.setFullName(user.getFullName());
                     profile.setRole(user.getRole().name());
                     profile.setProfileImageUrl(user.getProfileImageUrl());
                     profile.setCreatedAt(user.getCreatedAt());
+                    profile.setCity(user.getCity());
                     return ResponseEntity.ok((Object) profile);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -40,26 +43,35 @@ public class ProfileController {
     @PutMapping
     public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailIgnoreCase(email)
                 .map(user -> {
-                    if (dto.getFullName() != null) {
-                        user.setFullName(dto.getFullName());
+                    if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
+                        user.setFirstName(dto.getFirstName().trim());
+                    }
+                    if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
+                        user.setLastName(dto.getLastName().trim());
+                    }
+                    if (dto.getFullName() != null && !dto.getFullName().isBlank()) {
+                        user.setFullName(dto.getFullName().trim());
                     }
                     if (dto.getCity() != null) {
-                        user.setCity(dto.getCity());
+                        user.setCity(dto.getCity().isBlank() ? null : dto.getCity().trim());
                     }
                     if (dto.getProfileImageUrl() != null) {
                         user.setProfileImageUrl(dto.getProfileImageUrl());
                     }
                     userRepository.save(user);
-                    
+
                     UserProfileDTO profile = new UserProfileDTO();
                     profile.setId(user.getId());
                     profile.setEmail(user.getEmail());
+                    profile.setFirstName(user.getFirstName());
+                    profile.setLastName(user.getLastName());
                     profile.setFullName(user.getFullName());
                     profile.setRole(user.getRole().name());
                     profile.setProfileImageUrl(user.getProfileImageUrl());
                     profile.setCreatedAt(user.getCreatedAt());
+                    profile.setCity(user.getCity());
                     return ResponseEntity.ok((Object) profile);
                 })
                 .orElse(ResponseEntity.notFound().build());

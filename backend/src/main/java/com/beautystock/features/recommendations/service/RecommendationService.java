@@ -24,22 +24,94 @@ public class RecommendationService {
     @Value("${app.weather.api-url}")
     private String weatherApiUrl;
 
+    private boolean hasWeatherApiKey() {
+        return weatherApiKey != null && !weatherApiKey.isBlank() && !weatherApiKey.contains("${");
+    }
+
+    private WeatherResponse buildFallbackWeatherResponse(String role, String city, String reason) {
+        String advice = "ROLE_YOUTH".equals(role)
+                ? "Weather service is temporarily unavailable. Use a gentle cleanser, lightweight moisturizer, and daily SPF."
+                : "Weather service is temporarily unavailable. Use a hydrating cleanser, barrier-supporting moisturizer, and daily SPF.";
+
+        if (reason != null && !reason.isBlank()) {
+            advice = advice + " " + reason;
+        }
+
+        return new WeatherResponse(city, null, null, null, advice.trim());
+    }
+
     public RecommendationService(RestTemplate restTemplate, UserRepository userRepository) {
         this.restTemplate = restTemplate;
         this.userRepository = userRepository;
     }
 
-    public WeatherResponse getWeatherAdvice(String role) {
-        try {
-            String currentEmail = getCurrentEmail();
-            User user = userRepository.findByEmail(currentEmail)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    public WeatherResponse getWeatherAdviceForCity(String role, String city) {
+        if (city == null || city.isBlank()) {
+            return getWeatherAdvice(role);
+        }
 
-            String city = user.getCity();
-            if (city == null || city.isBlank()) {
-                return new WeatherResponse(null, null, null, null, "Please set your city to get weather-based skincare tips");
+        if (!hasWeatherApiKey()) {
+            return buildFallbackWeatherResponse(role, city, "Please configure the OpenWeatherMap API key to enable live weather data.");
+        }
+
+        try {
+            String normalizedCity = city.trim().replaceAll("\\s+", " ");
+            boolean userSuppliedCountry = normalizedCity.contains(",");
+            Map<String, Object> weatherData = null;
+
+            if (!userSuppliedCountry) {
+                try {
+                    weatherData = fetchWeather(normalizedCity + ",PH");
+                } catch (org.springframework.web.client.HttpClientErrorException.NotFound ignored) {}
+            }
+            if (weatherData == null) {
+                try {
+                    weatherData = fetchWeather(normalizedCity);
+                } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
+                    return new WeatherResponse(city, null, null, null,
+                            "City '" + city + "' was not found. Please check the spelling or try a nearby major city.");
+                }
+            }
+            if (weatherData == null) {
+                return new WeatherResponse(city, null, null, null, "Unable to fetch weather data for " + city);
             }
 
+            Double temperature = null;
+            Integer humidity = null;
+            String condition = null;
+            Map<String, Object> main = (Map<String, Object>) weatherData.get("main");
+            if (main != null) {
+                Object tempObj = main.get("temp");
+                Object humidityObj = main.get("humidity");
+                if (tempObj != null) temperature = ((Number) tempObj).doubleValue();
+                if (humidityObj != null) humidity = ((Number) humidityObj).intValue();
+            }
+            java.util.List<Map<String, Object>> weather = (java.util.List<Map<String, Object>>) weatherData.get("weather");
+            if (weather != null && !weather.isEmpty()) {
+                condition = (String) weather.get(0).get("main");
+            }
+            String advice = generateAdvice(role, temperature, humidity, condition);
+            return new WeatherResponse(city, temperature, humidity, condition, advice);
+        } catch (Exception e) {
+            return buildFallbackWeatherResponse(role, city, "Showing general skincare guidance until weather data is available.");
+        }
+    }
+
+    public WeatherResponse getWeatherAdvice(String role) {
+        String currentEmail = getCurrentEmail();
+        User user = userRepository.findByEmailIgnoreCase(currentEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String city = user.getCity();
+        if (city == null || city.isBlank()) {
+            return new WeatherResponse(null, null, null, null, "Please set your city to get weather-based skincare tips");
+        }
+
+        if (!hasWeatherApiKey()) {
+            return buildFallbackWeatherResponse(role, city, "Please configure the OpenWeatherMap API key to enable live weather data.");
+        }
+
+        try {
             // Normalize the city input (trim whitespace, collapse spaces)
             String normalizedCity = city.trim().replaceAll("\\s+", " ");
 
@@ -115,16 +187,17 @@ public class RecommendationService {
 
                 return new WeatherResponse(city, temperature, humidity, condition, advice);
             } catch (org.springframework.web.client.HttpClientErrorException.Unauthorized e) {
-                String errorMsg = "Weather API Error: Invalid API key. Please check your OpenWeatherMap API key configuration.";
+                String errorMsg = "Weather service is temporarily unavailable. Showing general skincare guidance instead.";
                 System.err.println(errorMsg);
                 e.printStackTrace();
-                return new WeatherResponse(city, null, null, null, errorMsg);
+                return buildFallbackWeatherResponse(role, city, "Please configure a valid OpenWeatherMap API key to enable live weather data.");
+            } catch (org.springframework.web.client.HttpClientErrorException.Forbidden e) {
+                return buildFallbackWeatherResponse(role, city, "Please configure a valid OpenWeatherMap API key to enable live weather data.");
             }
         } catch (Exception e) {
-            String errorMsg = "Error fetching weather data: " + e.getMessage();
-            System.err.println(errorMsg);
+            System.err.println("Error fetching weather data: " + e.getMessage());
             e.printStackTrace();
-            return new WeatherResponse(null, null, null, null, errorMsg);
+            return buildFallbackWeatherResponse(role, city, "Showing general skincare guidance until weather data is available.");
         }
     }
 
@@ -221,6 +294,10 @@ public class RecommendationService {
     }
 
     private Map<String, Object> fetchWeather(String query) {
+        if (!hasWeatherApiKey()) {
+            throw new org.springframework.web.client.HttpClientErrorException(org.springframework.http.HttpStatus.UNAUTHORIZED,
+                    "Missing weather API key");
+        }
         String url = weatherApiUrl + "/weather?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8) + "&appid=" + weatherApiKey + "&units=metric";
         try {
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);

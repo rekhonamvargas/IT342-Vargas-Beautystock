@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api'
+export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api'
+export const BACKEND_ORIGIN = API_BASE_URL.startsWith('http')
+  ? API_BASE_URL.replace(/\/api\/?$/, '')
+  : window.location.origin
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -50,6 +53,7 @@ export const authApi = {
   googleAuth: (idToken: string, ageRange?: string) => apiClient.post('/v1/auth/google', { idToken, ageRange }),
   logout: () => apiClient.post('/v1/auth/logout'),
   getMe: () => apiClient.get('/v1/auth/me'),
+  updateRole: (role: 'ROLE_YOUTH' | 'ROLE_ADULT') => apiClient.patch('/v1/auth/me/role', { role }),
 }
 
 export const userApi = {

@@ -25,10 +25,11 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpiration);
 
+        String roleName = user.getRole() != null ? user.getRole().name() : "ROLE_ADULT";
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("userId", user.getId().toString())
-                .claim("role", user.getRole().name())
+                .claim("role", roleName)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(key)

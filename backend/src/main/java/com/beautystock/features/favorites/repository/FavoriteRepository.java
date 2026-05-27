@@ -11,4 +11,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     void deleteByOwnerEmailAndProduct(String ownerEmail, Product product);
     long countByOwnerEmail(String ownerEmail);
     Optional<Favorite> findByOwnerEmailAndProduct(String ownerEmail, Product product);
+    java.util.List<Favorite> findByOwnerEmail(String ownerEmail);
 }

@@ -1,10 +1,12 @@
 package com.beautystock.features.favorites.controller;
 
+import com.beautystock.features.products.dto.ProductDTO;
 import com.beautystock.features.products.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -16,6 +18,11 @@ public class FavoriteController {
 
     public FavoriteController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductDTO>> getFavorites() {
+        return ResponseEntity.ok(productService.getFavorites());
     }
 
     @PostMapping("/{productId}")

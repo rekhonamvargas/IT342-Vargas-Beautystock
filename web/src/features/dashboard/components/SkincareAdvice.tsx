@@ -258,6 +258,9 @@ export function SkincareAdvice() {
    const isYouth = user?.role === 'ROLE_YOUTH'
    const essentials = getEssentialsForWeather(weather, isYouth)
    const weatherMode = weather ? getWeatherMode(weather) : 'default'
+  const temperatureText = weather?.temperature != null ? `${weather.temperature}°C` : 'N/A'
+  const humidityText = weather?.humidity != null ? `${weather.humidity}%` : 'N/A'
+  const cityText = weather?.city || user?.city || 'Current location'
 
    const renderWavingText = (text: string) =>
      Array.from(text).map((character, index) => (
@@ -444,9 +447,9 @@ export function SkincareAdvice() {
                 {isYouth ? 'Youth' : 'Adult'} Weather Analysis
               </h3>
               <div className="flex flex-wrap gap-4 text-xs text-muted font-medium">
-                <span className="flex items-center gap-1.5">🌡️ <strong>{weather.temperature}°C</strong></span>
-                <span className="flex items-center gap-1.5">💧 <strong>{weather.humidity}%</strong> Humidity</span>
-                <span className="flex items-center gap-1.5">📍 <strong>{weather.city}</strong></span>
+                <span className="flex items-center gap-1.5">🌡️ <strong>{temperatureText}</strong></span>
+                <span className="flex items-center gap-1.5">💧 <strong>{humidityText}</strong> Humidity</span>
+                <span className="flex items-center gap-1.5">📍 <strong>{cityText}</strong></span>
                 {weather.condition && <span className="flex items-center gap-1.5">🌤️ {weather.condition}</span>}
               </div>
             </div>
@@ -516,7 +519,7 @@ export function SkincareAdvice() {
                   {' Essentials'}
                 </p>
                 <p className="text-xs text-muted">
-                  Optimized for {weather.temperature}°C and {weather.humidity}% humidity
+                  Optimized for {temperatureText} and {humidityText} humidity
                 </p>
               </div>
             </div>

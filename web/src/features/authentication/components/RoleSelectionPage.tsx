@@ -1,3 +1,4 @@
+import { authApi } from '@/services/api'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth'
@@ -25,22 +26,9 @@ export default function RoleSelectionPage() {
         return
       }
 
-      const response = await fetch('/api/v1/auth/me/role', {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          role: selectedRole === 'YOUTH' ? 'ROLE_YOUTH' : 'ROLE_ADULT',
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to update role')
-      }
+      localStorage.setItem('authToken', token)
+      const response = await authApi.updateRole(selectedRole === 'YOUTH' ? 'ROLE_YOUTH' : 'ROLE_ADULT')
+      const data = response.data
 
       // Save user
       setUser(data)
